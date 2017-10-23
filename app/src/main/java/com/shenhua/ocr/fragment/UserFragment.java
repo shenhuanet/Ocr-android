@@ -1,5 +1,6 @@
 package com.shenhua.ocr.fragment;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -19,6 +20,7 @@ import com.shenhua.ocr.R;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import butterknife.Unbinder;
 
 /**
@@ -33,6 +35,15 @@ public class UserFragment extends Fragment {
     @BindView(R.id.ivAvatar)
     ImageView ivAvatar;
     private View mRootView;
+    Callback callback;
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context != null) {
+            callback = (Callback) context;
+        }
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -79,5 +90,16 @@ public class UserFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         unbinder.unbind();
+    }
+
+    @OnClick(R.id.ivAvatar)
+    void click() {
+        if (callback != null) {
+            callback.onCallback("你好");
+        }
+    }
+
+    public interface Callback {
+        void onCallback(String msg);
     }
 }

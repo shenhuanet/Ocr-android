@@ -9,11 +9,12 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 
 import com.shenhua.ocr.R;
-import com.shenhua.ocr.fragment.CameraFragment;
 import com.shenhua.ocr.fragment.HistoryFragment;
 import com.shenhua.ocr.fragment.HomeFragment;
+import com.shenhua.ocr.fragment.TakePicFragment;
 import com.shenhua.ocr.fragment.UserFragment;
 import com.shenhua.ocr.helper.ControlPanel;
 
@@ -21,7 +22,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements UserFragment.Callback {
 
     @BindView(R.id.layoutPanel)
     FrameLayout layoutPanel;
@@ -57,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
         String name = null;
         switch (view.getId()) {
             case R.id.btnStart:
-                fragment = new CameraFragment();
+                fragment = new TakePicFragment();
                 name = "takePic";
                 break;
             case R.id.btnAccount:
@@ -82,4 +83,8 @@ public class MainActivity extends AppCompatActivity {
                 .commit();
     }
 
+    @Override
+    public void onCallback(String msg) {
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+    }
 }
