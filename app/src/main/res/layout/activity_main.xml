@@ -14,41 +14,61 @@
     <FrameLayout
         android:id="@+id/layoutPanel"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/panel_height"
         android:layout_gravity="bottom">
 
         <com.shenhua.ocr.widget.ArcView
             android:layout_width="match_parent"
             android:layout_height="@dimen/panel_height" />
 
-        <Button
-            android:id="@+id/btnAccount"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_gravity="bottom"
-            android:layout_margin="20dp"
-            android:background="@drawable/ic_account_circle_48px"
-            android:foreground="?attr/selectableItemBackground" />
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/transparent">
 
-        <Button
-            android:id="@+id/btnStart"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:layout_gravity="center"
-            android:layout_marginBottom="20dp"
-            android:background="@drawable/shape_btn_start"
-            android:foreground="?attr/selectableItemBackgroundBorderless"
-            android:text="开始"
-            android:textSize="26sp" />
+            <ImageButton
+                android:id="@+id/accountBtn"
+                style="@style/ImageButtonStyle.50"
+                android:layout_gravity="bottom"
+                android:layout_margin="@dimen/size_margin"
+                android:contentDescription="@null"
+                android:padding="3dp"
+                android:src="@drawable/ic_account_circle_48px" />
 
-        <Button
-            android:id="@+id/btnHistory"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_gravity="bottom|end"
-            android:layout_margin="20dp"
-            android:background="@drawable/ic_history_48px"
-            android:foreground="?attr/selectableItemBackground" />
+            <FrameLayout
+                android:layout_width="@dimen/size_100dp"
+                android:layout_height="@dimen/size_100dp"
+                android:layout_gravity="center"
+                android:layout_marginBottom="@dimen/size_margin">
+
+                <ImageButton
+                    android:id="@+id/startBtn"
+                    style="@style/ImageButtonStyle"
+                    android:layout_width="@dimen/size_100dp"
+                    android:layout_height="@dimen/size_100dp"
+                    android:contentDescription="@null"
+                    android:src="@drawable/shape_btn_start" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:text="@string/string_start"
+                    android:textColor="@android:color/white"
+                    android:textSize="@dimen/start_text_size" />
+
+            </FrameLayout>
+
+            <ImageButton
+                android:id="@+id/historyBtn"
+                style="@style/ImageButtonStyle.50"
+                android:layout_gravity="bottom|end"
+                android:layout_margin="@dimen/size_margin"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_history_48px" />
+
+        </FrameLayout>
 
     </FrameLayout>
 

@@ -12,6 +12,8 @@ import com.shenhua.ocr.R;
 /**
  * Created by shenhua on 2017-10-10-0010.
  * Email shenhuanet@126.com
+ *
+ * @author shenhua
  */
 public class ArcView extends View {
 

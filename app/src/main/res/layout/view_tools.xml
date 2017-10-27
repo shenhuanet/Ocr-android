@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <LinearLayout
+        android:id="@+id/toolsLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start|bottom"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="3dp"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/originToolTv"
+            style="@style/ToolItemsTextStyle"
+            android:drawableTop="@drawable/ic_tool_origin"
+            android:text="@string/string_origin" />
+
+        <TextView
+            android:id="@+id/heibaiToolTv"
+            style="@style/ToolItemsTextStyle"
+            android:drawableTop="@drawable/ic_tool_heibai"
+            android:text="@string/string_heibai" />
+
+        <TextView
+            android:id="@+id/grayToolTv"
+            style="@style/ToolItemsTextStyle"
+            android:drawableTop="@drawable/ic_tool_gray"
+            android:text="@string/string_gray" />
+
+        <TextView
+            android:id="@+id/binaryToolTv"
+            style="@style/ToolItemsTextStyle"
+            android:drawableTop="@drawable/ic_tool_binary"
+            android:text="@string/string_binary" />
+
+    </LinearLayout>
+
+</merge>

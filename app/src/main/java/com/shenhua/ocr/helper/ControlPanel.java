@@ -8,6 +8,8 @@ import android.view.animation.AccelerateInterpolator;
 /**
  * Created by shenhua on 2017-10-19-0019.
  * Email shenhuanet@126.com
+ *
+ * @author shenhua
  */
 public final class ControlPanel {
 

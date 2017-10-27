@@ -8,7 +8,7 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:textColorPrimary">@android:color/white</item>
         <!--<item name="android:windowTranslucentStatus">true</item>-->
-        <!--<item name="android:fitsSystemWindows">true</item>-->
+        <!--<item name="android:fitsSystemWindows">false</item>-->
     </style>
 
     <style name="ToolbarStyle">

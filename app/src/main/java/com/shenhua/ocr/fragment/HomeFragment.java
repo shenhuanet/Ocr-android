@@ -20,7 +20,9 @@ import butterknife.Unbinder;
 
 /**
  * Created by shenhua on 2017-10-19-0019.
- * Email shenhuanet@126.com
+ *
+ * @author shenhua
+ *         Email shenhuanet@126.com
  */
 public class HomeFragment extends Fragment {
 

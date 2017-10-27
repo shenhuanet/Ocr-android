@@ -64,6 +64,12 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
 
+/**
+ * Created by shenhua on 2017-10-19-0019.
+ *
+ * @author shenhua
+ *         Email shenhuanet@126.com
+ */
 public class CameraFragment extends Fragment implements ActivityCompat.OnRequestPermissionsResultCallback {
 
     /**
@@ -323,6 +329,8 @@ public class CameraFragment extends Fragment implements ActivityCompat.OnRequest
                     }
                     break;
                 }
+                default:
+                    break;
             }
         }
 
@@ -500,8 +508,9 @@ public class CameraFragment extends Fragment implements ActivityCompat.OnRequest
                 Size largest = Collections.max(
                         Arrays.asList(map.getOutputSizes(ImageFormat.JPEG)),
                         new CompareSizesByArea());
+                /*maxImages*/
                 mImageReader = ImageReader.newInstance(largest.getWidth(), largest.getHeight(),
-                        ImageFormat.JPEG, /*maxImages*/2);
+                        ImageFormat.JPEG, 2);
                 mImageReader.setOnImageAvailableListener(
                         mOnImageAvailableListener, mBackgroundHandler);
 
@@ -599,7 +608,8 @@ public class CameraFragment extends Fragment implements ActivityCompat.OnRequest
         Activity activity = getActivity();
         CameraManager manager = (CameraManager) activity.getSystemService(Context.CAMERA_SERVICE);
         try {
-            if (!mCameraOpenCloseLock.tryAcquire(2500, TimeUnit.MILLISECONDS)) {
+            int timeOut = 2500;
+            if (!mCameraOpenCloseLock.tryAcquire(timeOut, TimeUnit.MILLISECONDS)) {
                 throw new RuntimeException("Time out waiting to lock camera opening.");
             }
             manager.openCamera(mCameraId, mStateCallback, mBackgroundHandler);
@@ -823,7 +833,7 @@ public class CameraFragment extends Fragment implements ActivityCompat.OnRequest
             int rotation = activity.getWindowManager().getDefaultDisplay().getRotation();
             captureBuilder.set(CaptureRequest.JPEG_ORIENTATION, getOrientation(rotation));
 
-            CameraCaptureSession.CaptureCallback CaptureCallback
+            CameraCaptureSession.CaptureCallback captureCallback
                     = new CameraCaptureSession.CaptureCallback() {
 
                 @Override
@@ -838,7 +848,7 @@ public class CameraFragment extends Fragment implements ActivityCompat.OnRequest
 
             mCaptureSession.stopRepeating();
             mCaptureSession.abortCaptures();
-            mCaptureSession.capture(captureBuilder.build(), CaptureCallback, null);
+            mCaptureSession.capture(captureBuilder.build(), captureCallback, null);
         } catch (CameraAccessException e) {
             e.printStackTrace();
         }
@@ -1007,14 +1017,16 @@ public class CameraFragment extends Fragment implements ActivityCompat.OnRequest
         }
     }
 
-    @OnClick({R.id.btnCapture, R.id.btnBack})
+    @OnClick({R.id.captureBtn, R.id.backBtn})
     void clicks(View view) {
         switch (view.getId()) {
-            case R.id.btnCapture:
+            case R.id.captureBtn:
                 takePicture();
                 break;
-            case R.id.btnBack:
+            case R.id.backBtn:
                 getFragmentManager().popBackStack();
+                break;
+            default:
                 break;
         }
     }

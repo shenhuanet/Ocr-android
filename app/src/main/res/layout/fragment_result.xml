@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/resultLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/timeTv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        tools:text="用时 00:00:00" />
+
+    <EditText
+        android:id="@+id/resultEt"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_weight="0.5"
+        android:background="@drawable/bg_edit"
+        android:gravity="top|start"
+        android:inputType="textMultiLine"
+        android:labelFor="@+id/resultEt"
+        android:padding="5dp"
+        android:textColor="@color/colorPrimaryText"
+        android:textSize="14sp" />
+
+    <ImageView
+        android:id="@+id/srcIv"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_weight="0.7"
+        android:contentDescription="@null"
+        android:minWidth="300dp"
+        android:padding="10dp"
+        android:src="@drawable/img_sample" />
+
+    <include layout="@layout/view_more" />
+
+</LinearLayout>

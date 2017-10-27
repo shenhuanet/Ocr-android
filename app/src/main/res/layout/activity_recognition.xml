@@ -1,45 +1,25 @@
-<?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
     <FrameLayout
-        android:layout_width="300dp"
-        android:layout_height="400dp"
-        android:layout_gravity="center_horizontal"
+        android:id="@+id/container"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:background="@android:color/black">
 
-        <View
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_gravity="start"
-            android:background="@drawable/ic_angle1"
-            android:rotation="270" />
-
-        <View
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_gravity="end|bottom"
-            android:background="@drawable/ic_angle1"
-            android:rotation="90" />
-
-        <View
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_gravity="start|bottom"
-            android:background="@drawable/ic_angle2"
-            android:rotation="90" />
-
-        <View
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_gravity="end"
-            android:background="@drawable/ic_angle2"
-            android:rotation="270" />
+        <ImageView
+            android:id="@+id/srcIv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:minWidth="300dp" />
 
         <ImageView
-            android:id="@+id/ivScan"
+            android:id="@+id/scanIv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -48,15 +28,96 @@
             android:paddingBottom="10dp"
             android:paddingTop="10dp"
             android:scaleType="fitXY"
-            android:src="@drawable/ic_scan_line" />
+            android:src="@drawable/ic_scan_line"
+            android:visibility="gone" />
+
+        <include layout="@layout/view_tools" />
+
+        <LinearLayout
+            android:id="@+id/scanNotifyLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/ic_rect"
+            android:gravity="center"
+            android:visibility="gone">
+
+            <Chronometer
+                android:id="@+id/scanTimer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawableStart="@drawable/ic_notify"
+                android:format="00:%s"
+                android:gravity="center"
+                android:textColor="@android:color/white"
+                android:textSize="16sp" />
+
+        </LinearLayout>
 
     </FrameLayout>
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|center"
-        android:layout_margin="16dp"
-        android:text="end" />
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/constraintLayout"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/size_100dp">
 
-</FrameLayout>
+        <FrameLayout
+            android:id="@+id/btnLayout"
+            android:layout_width="@dimen/size_60dp"
+            android:layout_height="@dimen/size_60dp"
+            android:layout_gravity="center"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageButton
+                android:id="@+id/startBtn"
+                style="@style/ImageButtonStyle.60"
+                android:contentDescription="@null"
+                android:src="@drawable/shape_btn_start" />
+
+            <TextView
+                android:id="@+id/startTv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:text="@string/string_start"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/start_text_size_small" />
+
+        </FrameLayout>
+
+        <TextView
+            android:id="@+id/langTv"
+            style="@style/ClickTextStyle"
+            android:text="@string/string_chinese"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/resolveTv"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/resolveTv"
+            style="@style/ClickTextStyle"
+            android:text="@string/string_do_handle"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/btnLayout"
+            app:layout_constraintHorizontal_bias="0.8"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/rotationTv"
+            style="@style/ClickTextStyle"
+            android:text="@string/string_rotation"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/btnLayout"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </android.support.constraint.ConstraintLayout>
+
+</LinearLayout>

@@ -7,6 +7,8 @@ import android.view.TextureView;
 /**
  * Created by shenhua on 2017-10-20-0020.
  * Email shenhuanet@126.com
+ *
+ * @author shenhua
  */
 public class CameraView extends TextureView {
 

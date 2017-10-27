@@ -7,11 +7,11 @@
     <include layout="@layout/view_toolbar" />
 
     <ImageView
-        android:id="@+id/ivAvatar"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
+        android:id="@+id/avatarIv"
+        android:layout_width="@dimen/size_80dp"
+        android:layout_height="@dimen/size_80dp"
         android:layout_gravity="center"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="@dimen/size_margin"
         android:contentDescription="@string/app_name"
         android:scaleType="centerCrop" />
 

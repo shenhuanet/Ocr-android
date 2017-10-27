@@ -6,7 +6,7 @@ android {
     defaultConfig {
         applicationId "com.shenhua.ocr"
         minSdkVersion 21
-        targetSdkVersion 26
+        targetSdkVersion 22
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -14,6 +14,9 @@ android {
             cmake {
                 cppFlags ""
             }
+        }
+        ndk {
+            abiFilters 'armeabi', 'armeabi-v7a'
         }
     }
     buildTypes {
@@ -27,10 +30,16 @@ android {
             path "CMakeLists.txt"
         }
     }
+    repositories {
+        flatDir {
+            dirs 'libs'
+        }
+    }
 }
 
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile name: 'YoumiSdk_v7.5.0_2017-07-18', ext: 'aar'
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
@@ -41,6 +50,8 @@ dependencies {
     compile 'com.android.support:design:26.0.0-alpha1'
     compile 'com.android.support:palette-v7:26.0.0-alpha1'
     compile 'com.android.support.constraint:constraint-layout:1.0.0-beta4'
+    compile 'com.android.support:support-v4:26.+'
+    compile 'com.github.bumptech.glide:glide:4.0.0'
     testCompile 'junit:junit:4.12'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
 }

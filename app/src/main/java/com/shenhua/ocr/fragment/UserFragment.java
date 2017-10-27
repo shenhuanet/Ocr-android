@@ -25,14 +25,16 @@ import butterknife.Unbinder;
 
 /**
  * Created by shenhua on 2017-10-19-0019.
- * Email shenhuanet@126.com
+ *
+ * @author shenhua
+ *         Email shenhuanet@126.com
  */
 public class UserFragment extends Fragment {
 
     @BindView(R.id.toolbar)
     Toolbar toolbar;
     Unbinder unbinder;
-    @BindView(R.id.ivAvatar)
+    @BindView(R.id.avatarIv)
     ImageView ivAvatar;
     private View mRootView;
     Callback callback;
@@ -92,7 +94,7 @@ public class UserFragment extends Fragment {
         unbinder.unbind();
     }
 
-    @OnClick(R.id.ivAvatar)
+    @OnClick(R.id.avatarIv)
     void click() {
         if (callback != null) {
             callback.onCallback("你好");
@@ -100,6 +102,11 @@ public class UserFragment extends Fragment {
     }
 
     public interface Callback {
+        /**
+         * 回调方法
+         *
+         * @param msg 测试信息
+         */
         void onCallback(String msg);
     }
 }

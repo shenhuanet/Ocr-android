@@ -1,3 +1,17 @@
 <resources>
     <string name="app_name">OCR-Android</string>
+
+    <string name="title_activity_splash">SplashActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="string_start">开始</string>
+    <string name="string_do_handle">处理</string>
+    <string name="string_rotation">翻转</string>
+    <string name="string_chinese">中文</string>
+    <string name="string_origin">原图</string>
+    <string name="string_heibai">黑白</string>
+    <string name="string_gray">灰度化</string>
+    <string name="string_binary">二值化</string>
+    <string name="text_use_time_format">用时 %s</string>
+
 </resources>

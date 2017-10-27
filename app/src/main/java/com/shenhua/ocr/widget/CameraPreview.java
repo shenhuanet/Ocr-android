@@ -49,24 +49,57 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by shenhua on 2017-10-20-0020.
  * Email shenhuanet@126.com
+ *
+ * @author shenhua
  */
 public class CameraPreview extends TextureView {
 
     private static final String TAG = "CameraPreview";
-    private static final SparseIntArray ORIENTATIONS = new SparseIntArray();//从屏幕旋转转换为JPEG方向
-    private static final int MAX_PREVIEW_WIDTH = 1920;//Camera2 API 保证的最大预览宽高
+
+    /**
+     * 从屏幕旋转转换为JPEG方向
+     */
+    private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
+
+    /**
+     * Camera2 API 保证的最大预览宽高
+     */
+    private static final int MAX_PREVIEW_WIDTH = 1920;
     private static final int MAX_PREVIEW_HEIGHT = 1080;
-    private static final int STATE_PREVIEW = 0;//显示相机预览
-    private static final int STATE_WAITING_LOCK = 1;//焦点锁定中
-    private static final int STATE_WAITING_PRE_CAPTURE = 2;//拍照中
-    private static final int STATE_WAITING_NON_PRE_CAPTURE = 3;//其它状态
-    private static final int STATE_PICTURE_TAKEN = 4;//拍照完毕
+
+    /**
+     * 显示相机预览
+     */
+    private static final int STATE_PREVIEW = 0;
+
+    /**
+     * 焦点锁定中
+     */
+    private static final int STATE_WAITING_LOCK = 1;
+
+    /**
+     * 拍照中
+     */
+    private static final int STATE_WAITING_PRE_CAPTURE = 2;
+
+    /**
+     * 其它状态
+     */
+    private static final int STATE_WAITING_NON_PRE_CAPTURE = 3;
+
+    /**
+     * 拍照完毕
+     */
+    private static final int STATE_PICTURE_TAKEN = 4;
     private int mState = STATE_PREVIEW;
     private int mRatioWidth = 0, mRatioHeight = 0;
     private int mSensorOrientation;
     private boolean mFlashSupported;
 
-    private Semaphore mCameraOpenCloseLock = new Semaphore(1);//使用信号量 Semaphore 进行多线程任务调度
+    /**
+     * 使用信号量 Semaphore 进行多线程任务调度
+     */
+    private Semaphore mCameraOpenCloseLock = new Semaphore(1);
     private Activity activity;
     private File mFile;
     private HandlerThread mBackgroundThread;
@@ -271,6 +304,8 @@ public class CameraPreview extends TextureView {
                     }
                     break;
                 }
+                default:
+                    break;
             }
         }
 
@@ -328,7 +363,8 @@ public class CameraPreview extends TextureView {
         configureTransform(width, height);
         CameraManager manager = (CameraManager) getContext().getSystemService(Context.CAMERA_SERVICE);
         try {
-            if (!mCameraOpenCloseLock.tryAcquire(2500, TimeUnit.MILLISECONDS)) {
+            int timeOut = 2500;
+            if (!mCameraOpenCloseLock.tryAcquire(timeOut, TimeUnit.MILLISECONDS)) {
                 throw new RuntimeException("Time out waiting to lock camera opening.");
             }
             if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
@@ -392,8 +428,9 @@ public class CameraPreview extends TextureView {
 
                 Size largest = Collections.max(Arrays.asList(map.getOutputSizes(ImageFormat.JPEG)),
                         new CompareSizesByArea());
+                /*maxImages*/
                 mImageReader = ImageReader.newInstance(largest.getWidth(), largest.getHeight(),
-                        ImageFormat.JPEG, /*maxImages*/2);
+                        ImageFormat.JPEG, 2);
                 mImageReader.setOnImageAvailableListener(
                         mOnImageAvailableListener, mBackgroundHandler);
 
@@ -604,7 +641,7 @@ public class CameraPreview extends TextureView {
             // 方向
             int rotation = activity.getWindowManager().getDefaultDisplay().getRotation();
             captureBuilder.set(CaptureRequest.JPEG_ORIENTATION, getOrientation(rotation));
-            CameraCaptureSession.CaptureCallback CaptureCallback
+            CameraCaptureSession.CaptureCallback captureCallback
                     = new CameraCaptureSession.CaptureCallback() {
 
                 @Override
@@ -618,7 +655,7 @@ public class CameraPreview extends TextureView {
             };
             mCaptureSession.stopRepeating();
             mCaptureSession.abortCaptures();
-            mCaptureSession.capture(captureBuilder.build(), CaptureCallback, null);
+            mCaptureSession.capture(captureBuilder.build(), captureCallback, null);
         } catch (CameraAccessException e) {
             e.printStackTrace();
         }

@@ -25,6 +25,12 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.Unbinder;
 
+/**
+ * Created by shenhua on 2017-10-19-0019.
+ *
+ * @author shenhua
+ *         Email shenhuanet@126.com
+ */
 public class TakePicFragment extends Fragment implements ActivityCompat.OnRequestPermissionsResultCallback {
 
     private static final int REQUEST_CAMERA_PERMISSION = 1;
@@ -58,16 +64,18 @@ public class TakePicFragment extends Fragment implements ActivityCompat.OnReques
         super.onPause();
     }
 
-    @OnClick({R.id.btnCapture, R.id.btnBack, R.id.tvAlbum})
+    @OnClick({R.id.captureBtn, R.id.backBtn, R.id.albumBtn})
     void clicks(View view) {
         switch (view.getId()) {
-            case R.id.btnCapture:
+            case R.id.captureBtn:
                 cameraView.takePicture();
                 break;
-            case R.id.btnBack:
+            case R.id.backBtn:
                 getFragmentManager().popBackStack();
                 break;
-            case R.id.tvAlbum:
+            case R.id.albumBtn:
+                break;
+            default:
                 break;
         }
     }
