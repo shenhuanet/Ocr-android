@@ -44,7 +44,7 @@ public class HistoryAdapter extends RecyclerViewCursorAdapter<HistoryAdapter.Res
         holder.itemView.setTag(cursor.getLong(cursor.getColumnIndex(HistoryDatabase.KEY_ID)));
         holder.contentTv.setText(cursor.getString(cursor.getColumnIndex(HistoryDatabase.KEY_RESULT)));
         holder.timeTv.setText(cursor.getString(cursor.getColumnIndex(HistoryDatabase.KEY_TIME)));
-        holder.dateTv.setText(Common.formatDate(cursor.getLong(cursor.getColumnIndex(HistoryDatabase.KEY_DATE))));
+        holder.dateTv.setText(Common.formatDate(cursor.getLong(cursor.getColumnIndex(HistoryDatabase.KEY_UPDATE))));
         Glide.with(mContext).load(cursor.getString(cursor.getColumnIndex(HistoryDatabase.KEY_IMG))).into(holder.srcIv);
     }
 

@@ -26,7 +26,7 @@ public class HistoryDatabase extends SQLiteOpenHelper {
     public static final String KEY_RESULT = "_result";
     public static final String KEY_TIME = "_time";
     public static final String KEY_IMG = "_image";
-    private static final String KEY_UPDATE = "_update";
+    public static final String KEY_UPDATE = "_update";
 
     public HistoryDatabase(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
@@ -72,7 +72,7 @@ public class HistoryDatabase extends SQLiteOpenHelper {
         cv.put(KEY_TIME, item.getTime());
         cv.put(KEY_IMG, item.getImg());
         cv.put(KEY_UPDATE, item.getDate());
-        return getWritableDatabase().insert(TABLE_NAME, null, cv);
+        return getWritableDatabase().insert(TABLE_NAME, KEY_RESULT, cv);
     }
 
     /**
@@ -82,26 +82,12 @@ public class HistoryDatabase extends SQLiteOpenHelper {
      * @param result 新值
      */
     public void update(long id, String result) {
-        getWritableDatabase().execSQL(
-                "UPDATE " + TABLE_NAME
-                        + " set "
-                        + KEY_RESULT + "=" + result
-                        + " where "
-                        + KEY_ID + "='" + id + "';"
-        );
-        getWritableDatabase().execSQL(
-                "UPDATE " + TABLE_NAME
-                        + " set "
-                        + KEY_UPDATE + "=" + System.currentTimeMillis()
-                        + " where "
-                        + KEY_ID + "='" + id + "';"
-        );
-        // ContentValues cv = new ContentValues();
-        // cv.put(KEY_RESULT,result);
-        // String where = KEY_ID + "=?";
-        // String[] whereValues = {String.valueOf(id)};
-        // String[] whereValues = {Long.toString(id)};
-        // getWritableDatabase().update(TABLE_NAME, cv, where, whereValues);
+        ContentValues cv = new ContentValues();
+        cv.put(KEY_RESULT,result);
+        cv.put(KEY_UPDATE,System.currentTimeMillis());
+        String where =  KEY_ID + "=?";
+        String[] whereValues = {Long.toString(id)};
+        getWritableDatabase().update(TABLE_NAME,cv,where,whereValues);
     }
 
     /**
