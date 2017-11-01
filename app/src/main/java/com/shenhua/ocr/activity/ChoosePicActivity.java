@@ -16,6 +16,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Toast;
 
+import com.shenhua.ocr.R;
 import com.shenhua.ocr.fragment.TakePicFragment;
 import com.shenhua.ocr.utils.Common;
 
@@ -58,20 +59,29 @@ public class ChoosePicActivity extends AppCompatActivity {
         } else if (ACTION_CROP == action) {
             Uri uri = getIntent().getParcelableExtra("uri");
             if (uri == null) {
-                finishByError("无效 Uri");
+                finishByError(getString(R.string.string_invalid_uri));
             }
             cropImage(uri);
         } else {
-            finishByError("无效 Action");
+            finishByError(getString(R.string.string_invalid_action));
         }
     }
 
+    /**
+     * 选取照片
+     */
     private void pick() {
         Intent intent = new Intent(Intent.ACTION_PICK, null);
         intent.setDataAndType(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
         startActivityForResult(intent, REQUEST_PICK_PICTURE);
     }
 
+    /**
+     * 复制图片文件到文件
+     *
+     * @param uri tempUri
+     */
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     public void cropImage(Uri uri) {
         File file = Common.getTempPhoto(this);
         try {
@@ -110,7 +120,7 @@ public class ChoosePicActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == REQUEST_STORAGE_PERMISSION) {
             if (grantResults.length != 1 || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(this, "需要获取文件访问权限,否则该功能无法使用", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, R.string.string_get_file_permission, Toast.LENGTH_SHORT).show();
             }
         } else {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -139,12 +149,20 @@ public class ChoosePicActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * 跳转至识别Activity
+     */
     private void navRecognition() {
         startActivity(new Intent(this, RecognitionActivity.class).putExtra("temp", mOutUri));
         setResult(RESULT_OK);
         this.finish();
     }
 
+    /**
+     * 发生错误时触发并结束当前
+     *
+     * @param msg 错误消息
+     */
     private void finishByError(String msg) {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
         setResult(RESULT_CANCELED);

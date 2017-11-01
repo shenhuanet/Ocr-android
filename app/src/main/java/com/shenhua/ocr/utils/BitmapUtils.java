@@ -48,6 +48,7 @@ public class BitmapUtils {
      * @param origin bitmap
      * @return Bitmap
      */
+    @SuppressWarnings("NumericOverflow")
     public static Bitmap turnBlackWhite(Bitmap origin) {
         int w = origin.getWidth();
         int h = origin.getHeight();
@@ -136,6 +137,13 @@ public class BitmapUtils {
         return bitmap;
     }
 
+    /**
+     * 7.0 获取文件真实路径
+     *
+     * @param context Context
+     * @param data    Intent
+     * @return String path
+     */
     public String getImagePath(Context context, Intent data) {
         if (data == null) {
             return null;
@@ -146,25 +154,33 @@ public class BitmapUtils {
         if (DocumentsContract.isDocumentUri(context, uri)) {
             String docId = DocumentsContract.getDocumentId(uri);
 
-            if ("com.android.providers.media.documents".equals(uri.getAuthority())) {
+            if (Common.PROVIDER_MEDIA.equals(uri.getAuthority())) {
                 // 解析出数字格式的id
                 String id = docId.split(":")[1];
                 String selection = MediaStore.Images.Media._ID + "=" + id;
                 imagePath = getImagePath(context, MediaStore.Images.Media.EXTERNAL_CONTENT_URI, selection);
-            } else if ("com.android.providers.downloads.documents".equals(uri.getAuthority())) {
+            } else if (Common.PROVIDER_DOWNLOAD.equals(uri.getAuthority())) {
                 Uri contentUri = ContentUris.withAppendedId(Uri.parse("content://downloads/public_downloads"), Long.valueOf(docId));
                 imagePath = getImagePath(context, contentUri, null);
             }
-        } else if ("content".equalsIgnoreCase(uri.getScheme())) {
+        } else if (Common.PROVIDER_CONTENT.equalsIgnoreCase(uri.getScheme())) {
             // 如果是content类型的Uri，则使用普通方式处理
             imagePath = getImagePath(context, uri, null);
-        } else if ("file".equalsIgnoreCase(uri.getScheme())) {
+        } else if (Common.PROVIDER_FILE.equalsIgnoreCase(uri.getScheme())) {
             // 如果是file类型的Uri，直接获取图片路径即可
             imagePath = uri.getPath();
         }
         return imagePath;
     }
 
+    /**
+     * 普通方式获取文件真实路径
+     *
+     * @param context   context
+     * @param uri       uri
+     * @param selection 选择参数,可空
+     * @return String path
+     */
     private String getImagePath(Context context, Uri uri, String selection) {
         String path = null;
         // 通过Uri和selection来获取真实的图片路径

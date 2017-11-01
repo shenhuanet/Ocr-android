@@ -9,23 +9,15 @@
         android:padding="5dp">
 
         <ImageButton
-            android:id="@+id/outputBtn"
-            style="@style/ImageButtonStyle.50"
-            android:contentDescription="@null"
-            android:src="@drawable/ic_output"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/copyBtn"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <ImageButton
             android:id="@+id/copyBtn"
             style="@style/ImageButtonStyle.50"
             android:contentDescription="@null"
-            android:padding="3dp"
             android:src="@drawable/ic_copy"
-            app:layout_constraintEnd_toEndOf="@+id/shareBtn"
-            app:layout_constraintStart_toEndOf="@+id/outputBtn" />
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/shareBtn"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
 
         <ImageButton
             android:id="@+id/shareBtn"

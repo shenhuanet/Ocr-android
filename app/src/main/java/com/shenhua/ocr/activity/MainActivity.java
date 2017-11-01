@@ -31,7 +31,7 @@ import butterknife.OnClick;
 public class MainActivity extends AppCompatActivity implements UserFragment.Callback {
 
     @BindView(R.id.layoutPanel)
-    ViewGroup layoutPanel;
+    ViewGroup mLayoutPanel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity implements UserFragment.Call
         }
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-        ControlPanel.get().attachView(layoutPanel);
+        ControlPanel.get().attachView(mLayoutPanel);
         getSupportFragmentManager().beginTransaction()
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
                 .replace(R.id.fragment_container, new HomeFragment())
@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity implements UserFragment.Call
             @Override
             public void onBackStackChanged() {
                 if (getSupportFragmentManager().getBackStackEntryCount() == 0) {
-                    ControlPanel.get().expand(layoutPanel);
+                    ControlPanel.get().expand(mLayoutPanel);
                 }
             }
         });
@@ -78,7 +78,7 @@ public class MainActivity extends AppCompatActivity implements UserFragment.Call
             default:
                 break;
         }
-        ControlPanel.get().collapse(layoutPanel);
+        ControlPanel.get().collapse(mLayoutPanel);
         replaceFragment(fragment, name);
     }
 

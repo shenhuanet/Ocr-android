@@ -3,7 +3,6 @@ package com.shenhua.ocr.adapter;
 import android.content.Context;
 import android.database.Cursor;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -76,7 +75,6 @@ public class HistoryAdapter extends BaseRecyclerCursorAdapter<HistoryAdapter.Res
 
     @Override
     protected void onContentChanged() {
-        Log.d("shenhuaLog -- " + HistoryAdapter.class.getSimpleName(), "onContentChanged: ");
     }
 
     public void setOnClickListener(OnClickListener listener) {

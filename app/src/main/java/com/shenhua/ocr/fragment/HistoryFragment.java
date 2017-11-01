@@ -9,6 +9,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -18,7 +19,6 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 
 import com.shenhua.ocr.R;
 import com.shenhua.ocr.activity.ResultActivity;
@@ -39,14 +39,12 @@ import butterknife.Unbinder;
 public class HistoryFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     @BindView(R.id.toolbar)
-    Toolbar toolbar;
-    Unbinder unbinder;
-    @BindView(R.id.rootLayout)
-    LinearLayout rootLayout;
+    Toolbar mToolbar;
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
     private View mRootView;
-    private HistoryAdapter historyAdapter;
+    private Unbinder mUnBinder;
+    private HistoryAdapter mHistoryAdapter;
     private static final int CURSOR_LOADER = 1;
 
     @Nullable
@@ -59,10 +57,13 @@ public class HistoryFragment extends Fragment implements LoaderManager.LoaderCal
         if (parent != null) {
             parent.removeView(mRootView);
         }
-        unbinder = ButterKnife.bind(this, mRootView);
-        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(true);
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        mUnBinder = ButterKnife.bind(this, mRootView);
+        ((AppCompatActivity) getActivity()).setSupportActionBar(mToolbar);
+        ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayShowHomeEnabled(true);
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
         setHasOptionsMenu(true);
         return mRootView;
     }
@@ -71,18 +72,18 @@ public class HistoryFragment extends Fragment implements LoaderManager.LoaderCal
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         getLoaderManager().initLoader(CURSOR_LOADER, null, this);
-        if (historyAdapter == null) {
-            historyAdapter = new HistoryAdapter(getContext(), null, 0);
+        if (mHistoryAdapter == null) {
+            mHistoryAdapter = new HistoryAdapter(getContext(), null, 2);
         }
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        recyclerView.setAdapter(historyAdapter);
-        historyAdapter.setOnClickListener(new HistoryAdapter.OnClickListener() {
+        recyclerView.setAdapter(mHistoryAdapter);
+        mHistoryAdapter.setOnClickListener(new HistoryAdapter.OnClickListener() {
             @Override
             public void onClick(int position, long id) {
                 navResult(position, id);
             }
         });
-        historyAdapter.setOnLongClickListener(new HistoryAdapter.OnLongClickListener() {
+        mHistoryAdapter.setOnLongClickListener(new HistoryAdapter.OnLongClickListener() {
             @Override
             public void onLongClick(int position, long id) {
                 showDialog(position, id);
@@ -94,18 +95,29 @@ public class HistoryFragment extends Fragment implements LoaderManager.LoaderCal
     public void onResume() {
         super.onResume();
         getLoaderManager().restartLoader(CURSOR_LOADER, null, this);
-//        getLoaderManager().getLoader(CURSOR_LOADER).startLoading();
     }
 
+    /**
+     * 跳转至结果详情页面
+     *
+     * @param position item position
+     * @param id       记录id
+     */
     private void navResult(int position, long id) {
         Intent intent = new Intent(getContext(), ResultActivity.class);
         intent.putExtra("id", id);
         startActivityForResult(intent, position);
     }
 
+    /**
+     * 长按显示对话框
+     *
+     * @param position item position
+     * @param id       记录id
+     */
     private void showDialog(final int position, final long id) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setItems(new CharSequence[]{"查看", "删除"}, new DialogInterface.OnClickListener() {
+        builder.setItems(new CharSequence[]{getString(R.string.string_viewer), getString(R.string.string_delete)}, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 if (which == 0) {
@@ -116,14 +128,22 @@ public class HistoryFragment extends Fragment implements LoaderManager.LoaderCal
                 }
             }
         });
+        builder.show();
     }
 
+    /**
+     * 删除一个条目
+     *
+     * @param position item position
+     * @param id       记录id
+     */
     private void deleteItem(int position, long id) {
         int p = HistoryDatabase.get(getContext()).remove(id);
         if (p > 0) {
-            historyAdapter.onItemRemoved(position);
+            mHistoryAdapter.onItemRemoved(position);
+            getLoaderManager().restartLoader(CURSOR_LOADER, null, this);
         } else {
-            Snackbar.make(mRootView, "删除失败", Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(mRootView, R.string.string_delete_error, Snackbar.LENGTH_SHORT).show();
         }
     }
 
@@ -139,7 +159,7 @@ public class HistoryFragment extends Fragment implements LoaderManager.LoaderCal
     public void onDestroyView() {
         super.onDestroyView();
         getLoaderManager().getLoader(CURSOR_LOADER).stopLoading();
-        unbinder.unbind();
+        mUnBinder.unbind();
     }
 
     @Override
@@ -159,11 +179,11 @@ public class HistoryFragment extends Fragment implements LoaderManager.LoaderCal
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         // hideProgress
-        historyAdapter.swapCursor(data);
+        mHistoryAdapter.swapCursor(data);
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-        historyAdapter.swapCursor(null);
+        mHistoryAdapter.swapCursor(null);
     }
 }

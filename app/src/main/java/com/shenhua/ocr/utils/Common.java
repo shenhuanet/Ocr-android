@@ -28,6 +28,11 @@ public class Common {
     public static final int REQUEST_CROP_PICTURE = 12;
     public static final String FRAGMENT_DIALOG = "dialog";
 
+    static final String PROVIDER_MEDIA = "com.android.providers.media.documents";
+    static final String PROVIDER_DOWNLOAD = "com.android.providers.media.documents";
+    static final String PROVIDER_CONTENT = "content";
+    static final String PROVIDER_FILE = "file";
+
     public static String formatDate(long date) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm", Locale.CHINA);
         return sdf.format(date);
@@ -89,8 +94,22 @@ public class Common {
         return new File(context.getExternalFilesDir(null), name);
     }
 
+    /**
+     * 获取字典文件目录
+     *
+     * @param context Context
+     * @return String
+     */
     public static String getTessDataDir(Context context) {
         return context.getFilesDir() + File.separator + "tessdata";
+    }
+
+    /**
+     * 生成保存的图片路径
+     * @return 路径
+     */
+    public static String getSaveFileName() {
+        return "IMG_" + System.currentTimeMillis() + ".jpg";
     }
 
 }

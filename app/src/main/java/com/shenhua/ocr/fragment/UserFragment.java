@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawableFactory;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
@@ -32,18 +33,18 @@ import butterknife.Unbinder;
 public class UserFragment extends Fragment {
 
     @BindView(R.id.toolbar)
-    Toolbar toolbar;
-    Unbinder unbinder;
+    Toolbar mToolbar;
     @BindView(R.id.avatarIv)
-    ImageView ivAvatar;
+    ImageView mIvAvatar;
     private View mRootView;
-    Callback callback;
+    private Callback mCallback;
+    private Unbinder mUnBinder;
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         if (context != null) {
-            callback = (Callback) context;
+            mCallback = (Callback) context;
         }
     }
 
@@ -62,10 +63,13 @@ public class UserFragment extends Fragment {
         if (parent != null) {
             parent.removeView(mRootView);
         }
-        unbinder = ButterKnife.bind(this, mRootView);
-        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(true);
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        mUnBinder = ButterKnife.bind(this, mRootView);
+        ((AppCompatActivity) getActivity()).setSupportActionBar(mToolbar);
+        ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayShowHomeEnabled(true);
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
         setHasOptionsMenu(true);
         return mRootView;
     }
@@ -76,7 +80,7 @@ public class UserFragment extends Fragment {
         Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.img_avatar);
         RoundedBitmapDrawable drawable = RoundedBitmapDrawableFactory.create(getResources(), bitmap);
         drawable.setCircular(true);
-        ivAvatar.setImageDrawable(drawable);
+        mIvAvatar.setImageDrawable(drawable);
         bitmap.recycle();
     }
 
@@ -91,13 +95,13 @@ public class UserFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        unbinder.unbind();
+        mUnBinder.unbind();
     }
 
     @OnClick(R.id.avatarIv)
     void click() {
-        if (callback != null) {
-            callback.onCallback("你好");
+        if (mCallback != null) {
+            mCallback.onCallback("你好");
         }
     }
 

@@ -41,12 +41,22 @@ public final class ControlPanel {
         return this;
     }
 
+    /**
+     * 展开
+     *
+     * @param panel panel
+     */
     public void expand(View panel) {
         ObjectAnimator animator = ObjectAnimator.ofFloat(panel, "translationY", panelHeight - 40, 0);
         animator.setInterpolator(new AccelerateInterpolator());
         animator.setDuration(500).start();
     }
 
+    /**
+     * 收缩,折叠
+     *
+     * @param panel panel
+     */
     public void collapse(View panel) {
         ObjectAnimator animator = ObjectAnimator.ofFloat(panel, "translationY", 0, panelHeight - 40);
         animator.setInterpolator(new AccelerateInterpolator());

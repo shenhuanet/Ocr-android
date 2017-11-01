@@ -27,9 +27,9 @@ import butterknife.Unbinder;
 public class HomeFragment extends Fragment {
 
     @BindView(R.id.toolbar)
-    Toolbar toolbar;
-    Unbinder unbinder;
+    Toolbar mToolbar;
     private View mRootView;
+    private Unbinder mUnBinder;
 
     @Nullable
     @Override
@@ -41,8 +41,8 @@ public class HomeFragment extends Fragment {
         if (parent != null) {
             parent.removeView(mRootView);
         }
-        unbinder = ButterKnife.bind(this, mRootView);
-        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+        mUnBinder = ButterKnife.bind(this, mRootView);
+        ((AppCompatActivity) getActivity()).setSupportActionBar(mToolbar);
         setHasOptionsMenu(true);
         return mRootView;
     }
@@ -63,6 +63,6 @@ public class HomeFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        unbinder.unbind();
+        mUnBinder.unbind();
     }
 }

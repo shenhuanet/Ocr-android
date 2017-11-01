@@ -47,14 +47,14 @@ import static com.shenhua.ocr.utils.Common.REQUEST_PICK_PICTURE;
 public class TakePicFragment extends Fragment implements ActivityCompat.OnRequestPermissionsResultCallback {
 
     @BindView(R.id.cameraView)
-    CameraPreview cameraView;
-    Unbinder unbinder;
+    CameraPreview mCameraView;
+    private Unbinder mUnBinder;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View mRootView = inflater.inflate(R.layout.fragment_takepic, container, false);
-        unbinder = ButterKnife.bind(this, mRootView);
+        mUnBinder = ButterKnife.bind(this, mRootView);
         return mRootView;
     }
 
@@ -66,12 +66,12 @@ public class TakePicFragment extends Fragment implements ActivityCompat.OnReques
             requestCameraPermission();
             return;
         }
-        cameraView.onResume();
+        mCameraView.onResume();
     }
 
     @Override
     public void onPause() {
-        cameraView.onPause();
+        mCameraView.onPause();
         super.onPause();
     }
 
@@ -79,7 +79,7 @@ public class TakePicFragment extends Fragment implements ActivityCompat.OnReques
     void clicks(View view) {
         switch (view.getId()) {
             case R.id.captureBtn:
-                cameraView.takePicture(new CameraPreview.CapturePictureListener() {
+                mCameraView.takePicture(new CameraPreview.CapturePictureListener() {
                     @Override
                     public void onCapture(File file) {
                         try {
@@ -118,7 +118,7 @@ public class TakePicFragment extends Fragment implements ActivityCompat.OnReques
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == REQUEST_CAMERA_PERMISSION) {
             if (grantResults.length != 1 || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(getContext(), "需要获取拍照权限,否则拍照功能无法使用", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), R.string.string_camera_permission, Toast.LENGTH_SHORT).show();
             }
         } else {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -128,7 +128,7 @@ public class TakePicFragment extends Fragment implements ActivityCompat.OnReques
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        unbinder.unbind();
+        mUnBinder.unbind();
     }
 
     @Override
@@ -144,6 +144,9 @@ public class TakePicFragment extends Fragment implements ActivityCompat.OnReques
         }
     }
 
+    /**
+     * 授权dialog
+     */
     public static class ConfirmationDialog extends DialogFragment {
 
         @NonNull
@@ -151,7 +154,7 @@ public class TakePicFragment extends Fragment implements ActivityCompat.OnReques
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             final Fragment parent = getParentFragment();
             return new AlertDialog.Builder(getActivity())
-                    .setMessage("需要获取用户权限")
+                    .setMessage(R.string.string_need_permission)
                     .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
@@ -163,7 +166,7 @@ public class TakePicFragment extends Fragment implements ActivityCompat.OnReques
                             new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    Toast.makeText(getContext(), "相机无法使用", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(getContext(), R.string.string_camera_unavailable, Toast.LENGTH_SHORT).show();
                                 }
                             })
                     .create();

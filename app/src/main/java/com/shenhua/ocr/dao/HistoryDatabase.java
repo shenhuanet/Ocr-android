@@ -184,12 +184,10 @@ public class HistoryDatabase extends SQLiteOpenHelper {
             String time = cursor.getString(cursor.getColumnIndex(KEY_TIME));
             String path = cursor.getString(cursor.getColumnIndex(KEY_IMG));
             History history = new History(id, date, result, time, path);
-            Log.d("shenhuaLog -- " + HistoryDatabase.class.getSimpleName(), "find: >> " + result);
             histories.add(history);
         }
         cursor.close();
         return histories;
     }
-
 
 }

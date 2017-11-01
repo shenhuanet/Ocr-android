@@ -4,7 +4,9 @@
     <string name="title_activity_splash">SplashActivity</string>
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
+
     <string name="string_start">开始</string>
+    <string name="string_cancel">取消</string>
     <string name="string_do_handle">处理</string>
     <string name="string_rotation">翻转</string>
     <string name="string_chinese">中文</string>
@@ -13,5 +15,32 @@
     <string name="string_gray">灰度化</string>
     <string name="string_binary">二值化</string>
     <string name="text_use_time_format">用时 %s</string>
+    <string name="string_invalid_action">无效 Action</string>
+    <string name="string_invalid_uri">无效 Uri</string>
+    <string name="string_get_file_permission">需要获取文件访问权限,否则该功能无法使用</string>
+    <string name="string_null_pic">图片资源为空,操作不能进行</string>
+    <string name="string_en_done">已切换为英文模式</string>
+    <string name="string_chinese_done">已切换为中文模式</string>
+    <string name="string_null_pic_single">图片为空</string>
+    <string name="string_pic_not_a888">图片非ARGB_8888格式</string>
+    <string name="error_tessdata_folder">Data path must contain subfolder tessdata!</string>
+    <string name="string_tess_not_ready">字典文件没有准备好</string>
+    <string name="string_clip_done">已复制到剪切板</string>
+    <string name="string_choise_intent">请选择一个要分享的应用：</string>
+    <string name="string_share_error">不能完成分享</string>
+    <string name="string_record_update">记录已更新</string>
+    <string name="string_record_saved">数据已保存</string>
+    <string name="string_record_not_save">数据未保存</string>
+    <string name="string_splash_prepare">正在准备字典文件</string>
+    <string name="string_splash_start_copy">开始拷贝字典文件</string>
+    <string name="string_splash_param_error">参数错误 params[1] is dest dir.</string>
+    <string name="string_splash_copy_error">拷贝字典出错</string>
+    <string name="string_splash_copy">拷贝:</string>
+    <string name="string_delete_error">删除失败</string>
+    <string name="string_viewer">查看</string>
+    <string name="string_delete">删除</string>
+    <string name="string_camera_permission">需要获取拍照权限,否则拍照功能无法使用</string>
+    <string name="string_need_permission">需要获取用户权限</string>
+    <string name="string_camera_unavailable">相机无法使用</string>
 
 </resources>

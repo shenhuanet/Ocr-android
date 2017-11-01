@@ -40,10 +40,10 @@ import butterknife.ButterKnife;
 public class SplashActivity extends AppCompatActivity {
 
     @BindView(R.id.adView)
-    RelativeLayout adView;
+    RelativeLayout mAdView;
     @BindView(R.id.infoTv)
-    TextView infoTv;
-    private boolean ready;
+    TextView mInfoTv;
+    private boolean isReady;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +72,9 @@ public class SplashActivity extends AppCompatActivity {
         task.execute("", getFilesDir() + "/tessdata");
     }
 
+    /**
+     * 复制文件的异步任务
+     */
     private class CopyFiles extends AsyncTask<String, String, Void> {
 
         Context context;
@@ -83,7 +86,7 @@ public class SplashActivity extends AppCompatActivity {
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            onProgressUpdate("正在准备字典文件");
+            onProgressUpdate(getString(R.string.string_splash_prepare));
         }
 
         @Override
@@ -93,17 +96,17 @@ public class SplashActivity extends AppCompatActivity {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-            publishProgress("开始拷贝字典文件");
+            publishProgress(getString(R.string.string_splash_start_copy));
             String src = params[0];
             String dest = params[1];
             if (TextUtils.isEmpty(dest)) {
-                throw new RuntimeException("参数错误 params[1] is dest dir.");
+                throw new RuntimeException(getString(R.string.string_splash_param_error));
             }
             try {
                 copy(src, dest);
             } catch (IOException e) {
                 e.printStackTrace();
-                publishProgress("拷贝字典出错");
+                publishProgress(getString(R.string.string_splash_copy_error));
             }
             return null;
         }
@@ -124,7 +127,7 @@ public class SplashActivity extends AppCompatActivity {
                     }
                 }
             } else {
-                publishProgress("拷贝: " + src + " ...");
+                publishProgress(getString(R.string.string_splash_copy) + src + " ...");
                 File outFile = new File(dest);
                 InputStream is = context.getAssets().open(src);
                 FileOutputStream fos = new FileOutputStream(outFile);
@@ -142,8 +145,8 @@ public class SplashActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            infoTv.setText("");
-            if (ready) {
+            mInfoTv.setText("");
+            if (isReady) {
                 nav();
             }
         }
@@ -151,7 +154,7 @@ public class SplashActivity extends AppCompatActivity {
         @Override
         protected void onProgressUpdate(String... values) {
             super.onProgressUpdate(values);
-            infoTv.setText(values[0]);
+            mInfoTv.setText(values[0]);
         }
     }
 
@@ -198,7 +201,7 @@ public class SplashActivity extends AppCompatActivity {
         splashViewSettings.setAutoJumpToTargetWhenShowFailed(false);
         splashViewSettings.setTargetClass(MainActivity.class);
         // 设置开屏的容器
-        splashViewSettings.setSplashViewContainer(adView);
+        splashViewSettings.setSplashViewContainer(mAdView);
         // 展示开屏广告
         SpotManager.getInstance(this)
                 .showSplash(this, splashViewSettings, new SpotListener() {
@@ -229,7 +232,7 @@ public class SplashActivity extends AppCompatActivity {
                             default:
                                 break;
                         }
-                        ready = true;
+                        isReady = true;
                     }
 
                     @Override
@@ -244,8 +247,11 @@ public class SplashActivity extends AppCompatActivity {
                 });
     }
 
+    /**
+     * 跳转至主页面
+     */
     private void nav() {
-        adView.postDelayed(new Runnable() {
+        mAdView.postDelayed(new Runnable() {
             @Override
             public void run() {
                 startActivity(new Intent(SplashActivity.this, MainActivity.class));

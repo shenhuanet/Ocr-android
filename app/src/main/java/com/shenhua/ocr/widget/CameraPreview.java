@@ -125,7 +125,7 @@ public class CameraPreview extends TextureView {
 
     public CameraPreview(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        mFile = new File(getContext().getFilesDir(), "pic.jpg");
+        mFile = new File(getContext().getExternalFilesDir(null), "pic.jpg");
     }
 
     @Override

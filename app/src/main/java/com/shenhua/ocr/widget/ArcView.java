@@ -10,6 +10,7 @@ import android.view.View;
 import com.shenhua.ocr.R;
 
 /**
+ * 弧形的view
  * Created by shenhua on 2017-10-10-0010.
  * Email shenhuanet@126.com
  *

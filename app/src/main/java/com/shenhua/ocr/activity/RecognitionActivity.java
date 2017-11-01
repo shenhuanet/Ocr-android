@@ -17,7 +17,6 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Chronometer;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -56,55 +55,45 @@ public class RecognitionActivity extends AppCompatActivity {
      * worker
      */
     @BindView(R.id.scanIv)
-    ImageView ivScan;
+    ImageView mScanIv;
     @BindView(R.id.srcIv)
-    ImageView ivSrc;
+    ImageView mSrcIv;
     @BindView(R.id.scanNotifyLayout)
-    LinearLayout scanNotifyLayout;
+    LinearLayout mScanNotifyLayout;
     @BindView(R.id.scanTimer)
-    Chronometer scanTimer;
+    Chronometer mScanTimer;
     /**
      * tool items
      */
     @BindView(R.id.resolveTv)
-    TextView resolveTv;
+    TextView mResolveTv;
     @BindView(R.id.rotationTv)
-    TextView rotationTv;
+    TextView mRotationTv;
     @BindView(R.id.langTv)
-    TextView langTv;
+    TextView mLangTv;
     @BindView(R.id.startBtn)
-    ImageButton btnStart;
+    ImageButton mStartBtn;
     @BindView(R.id.startTv)
-    TextView startTv;
+    TextView mStartTv;
     /**
-     * tools panel and item
+     * tools panel
      */
     @BindView(R.id.toolsLayout)
-    LinearLayout toolsLayout;
-    @BindView(R.id.originToolTv)
-    TextView originToolTv;
-    @BindView(R.id.heibaiToolTv)
-    TextView heibaiToolTv;
-    @BindView(R.id.grayToolTv)
-    TextView grayToolTv;
-    @BindView(R.id.binaryToolTv)
-    TextView binaryToolTv;
+    LinearLayout mToolsLayout;
     /**
      * root layout
      */
-    @BindView(R.id.container)
-    FrameLayout container;
     @BindView(R.id.progressBar)
-    ProgressBar progressBar;
+    ProgressBar mProgressBar;
 
     private volatile boolean isStarting = false;
-    private ExecutorService executor;
-    private int currentItem = R.id.originToolTv;
+    private ExecutorService mExecutor;
+    private int mCurrentItem = R.id.originToolTv;
     /**
      * 是否已经准备好,用于控制当图片uri为空时,设置为未准备好
      */
     private boolean isReady = true;
-    private Uri tempUri;
+    private Uri mTempUri;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -113,16 +102,16 @@ public class RecognitionActivity extends AppCompatActivity {
         setContentView(R.layout.activity_recognition);
         ButterKnife.bind(this);
 
-        tempUri = getIntent().getParcelableExtra("temp");
+        mTempUri = getIntent().getParcelableExtra("temp");
         Bitmap bitmap = getOriginBitmap();
         if (bitmap == null) {
             isReady = false;
-            Snackbar.make(btnStart, "图片资源为空,操作不能进行", Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(mStartBtn, R.string.string_null_pic, Snackbar.LENGTH_SHORT).show();
         }
-        ivSrc.setImageBitmap(bitmap);
-        itemSelected(originToolTv);
-        langTv.setText(Common.getDisplayLanguage(this));
-        executor = Executors.newSingleThreadExecutor();
+        mSrcIv.setImageBitmap(bitmap);
+        itemSelected(mToolsLayout.getChildAt(0));
+        mLangTv.setText(Common.getDisplayLanguage(this));
+        mExecutor = Executors.newSingleThreadExecutor();
     }
 
     @Override
@@ -130,35 +119,44 @@ public class RecognitionActivity extends AppCompatActivity {
         super.onResume();
     }
 
+    /**
+     * 开始
+     */
     @OnClick(R.id.startBtn)
     void start() {
         if (!isReady) {
-            Snackbar.make(btnStart, "图片资源为空,操作不能进行", Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(mStartBtn, R.string.string_null_pic, Snackbar.LENGTH_SHORT).show();
             return;
         }
         if (!isStarting) {
             startScanAnim();
-            startTv.setText("取消");
-            Bitmap bitmap = ((BitmapDrawable) ivSrc.getDrawable()).getBitmap();
-            Log.d("RecognitionActivity", "start recognition ...... the bitmap width is " + bitmap.getWidth() + " height is " + bitmap.getHeight());
-            executor.execute(new OcrRunnable(this, bitmap));
+            mStartTv.setText(R.string.string_cancel);
+            Bitmap bitmap = ((BitmapDrawable) mSrcIv.getDrawable()).getBitmap();
+            Log.d("RecognitionActivity", "start recognition ...... the bitmap width is "
+                    + bitmap.getWidth() + " height is " + bitmap.getHeight());
+            mExecutor.execute(new OcrRunnable(this, bitmap));
             isStarting = true;
         } else {
             stopScanAnim();
-            startTv.setText("开始");
-            executor.shutdownNow();
+            mStartTv.setText(R.string.string_start);
+            mExecutor.shutdownNow();
             isStarting = false;
         }
     }
 
+    /**
+     * 识别成功时的回调
+     *
+     * @param result 识别结果
+     */
     private void scanSuccess(String result) {
         stopScanAnim();
         History data = new History();
-        data.setTime(scanTimer.getText().toString());
+        data.setTime(mScanTimer.getText().toString());
         data.setDate(System.currentTimeMillis());
         data.setResult(result);
-        File target = Common.getHistoryPhoto(this,getSaveFileName());
-        executor.execute(new CopyFileRunnable(tempUri, target));
+        File target = Common.getHistoryPhoto(this, Common.getSaveFileName());
+        mExecutor.execute(new CopyFileRunnable(mTempUri, target));
         data.setImg(target.getPath());
         Intent intent = new Intent(this, ResultActivity.class);
         Bundle bundle = new Bundle();
@@ -168,61 +166,65 @@ public class RecognitionActivity extends AppCompatActivity {
         this.finish();
     }
 
-    private String getSaveFileName() {
-        return "IMG_" + System.currentTimeMillis() + ".jpg";
-    }
-
+    /**
+     * 识别失败时回调
+     *
+     * @param msg 提示的信息
+     */
     private void scanFailed(String msg) {
         stopScanAnim();
-        Snackbar.make(btnStart, msg, Snackbar.LENGTH_SHORT).show();
-    }
-
-    private void startScanAnim() {
-        ivScan.setVisibility(View.VISIBLE);
-        Animation scanAnim = AnimationUtils.loadAnimation(this, R.anim.scan);
-        ivScan.setAnimation(scanAnim);
-        scanAnim.start();
-
-        Animation notify = AnimationUtils.loadAnimation(this, R.anim.right_in);
-        scanNotifyLayout.setAnimation(notify);
-        notify.start();
-        scanNotifyLayout.setVisibility(View.VISIBLE);
-
-        scanTimer.setBase(SystemClock.elapsedRealtime());
-        scanTimer.start();
-
-        toolsLayout.setVisibility(View.GONE);
-        resolveTv.setEnabled(false);
-        rotationTv.setEnabled(false);
-        langTv.setEnabled(false);
+        Snackbar.make(mStartBtn, msg, Snackbar.LENGTH_SHORT).show();
     }
 
     /**
-     * 停止扫描动画
+     * 开始扫面动画以及控制view的操作
+     */
+    private void startScanAnim() {
+        mScanIv.setVisibility(View.VISIBLE);
+        Animation scanAnim = AnimationUtils.loadAnimation(this, R.anim.scan);
+        mScanIv.setAnimation(scanAnim);
+        scanAnim.start();
+
+        Animation notify = AnimationUtils.loadAnimation(this, R.anim.right_in);
+        mScanNotifyLayout.setAnimation(notify);
+        notify.start();
+        mScanNotifyLayout.setVisibility(View.VISIBLE);
+
+        mScanTimer.setBase(SystemClock.elapsedRealtime());
+        mScanTimer.start();
+
+        mToolsLayout.setVisibility(View.GONE);
+        mResolveTv.setEnabled(false);
+        mRotationTv.setEnabled(false);
+        mLangTv.setEnabled(false);
+    }
+
+    /**
+     * 停止扫描动画以及控制view的操作
      */
     private void stopScanAnim() {
         try {
-            if (ivScan.getAnimation() != null) {
-                ivScan.getAnimation().cancel();
-                ivScan.clearAnimation();
-                ivScan.setVisibility(View.GONE);
+            if (mScanIv.getAnimation() != null) {
+                mScanIv.getAnimation().cancel();
+                mScanIv.clearAnimation();
+                mScanIv.setVisibility(View.GONE);
             }
         } catch (Exception e) {// NullPointerException
             e.printStackTrace();
         }
 
         Animation notify = AnimationUtils.loadAnimation(this, R.anim.right_out);
-        scanNotifyLayout.setAnimation(notify);
+        mScanNotifyLayout.setAnimation(notify);
         notify.start();
-        scanNotifyLayout.setVisibility(View.GONE);
+        mScanNotifyLayout.setVisibility(View.GONE);
 
-        scanTimer.stop();
+        mScanTimer.stop();
         isStarting = false;
-        startTv.setText("开始");
+        mStartTv.setText(R.string.string_start);
 
-        resolveTv.setEnabled(true);
-        rotationTv.setEnabled(true);
-        langTv.setEnabled(true);
+        mResolveTv.setEnabled(true);
+        mRotationTv.setEnabled(true);
+        mLangTv.setEnabled(true);
     }
 
     /**
@@ -230,26 +232,31 @@ public class RecognitionActivity extends AppCompatActivity {
      */
     @OnClick(R.id.resolveTv)
     void resolve() {
-        if (toolsLayout.getVisibility() == View.GONE) {
-            toolsLayout.setVisibility(View.VISIBLE);
+        if (mToolsLayout.getVisibility() == View.GONE) {
+            mToolsLayout.setVisibility(View.VISIBLE);
         } else {
-            toolsLayout.setVisibility(View.GONE);
+            mToolsLayout.setVisibility(View.GONE);
         }
     }
 
+    /**
+     * 更换当前图片处理选项
+     *
+     * @param view views
+     */
     @OnClick({R.id.originToolTv, R.id.heibaiToolTv, R.id.grayToolTv, R.id.binaryToolTv})
     void changeTool(View view) {
         if (!isReady) {
-            Snackbar.make(btnStart, "图片资源为空,操作不能进行", Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(mStartBtn, R.string.string_null_pic, Snackbar.LENGTH_SHORT).show();
             return;
         }
-        if (view.getId() == currentItem) {
+        if (view.getId() == mCurrentItem) {
             return;
         }
-        Bitmap bitmap = ((BitmapDrawable) ivSrc.getDrawable()).getBitmap();
-        currentItem = view.getId();
-        itemSelected((TextView) view);
-        executor.execute(new BitmapResolveRunnable(bitmap, view.getId()));
+        Bitmap bitmap = getOriginBitmap();
+        mCurrentItem = view.getId();
+        itemSelected(view);
+        mExecutor.execute(new BitmapResolveRunnable(bitmap, view.getId()));
     }
 
     /**
@@ -258,38 +265,44 @@ public class RecognitionActivity extends AppCompatActivity {
     @OnClick(R.id.langTv)
     void changeLang(View view) {
         TextView textView = (TextView) view;
-        if ("中文".equals(textView.getText().toString())) {
+        if (getString(R.string.string_chinese).equals(textView.getText().toString())) {
             Common.saveLanguage(this, 1);
-            Snackbar.make(toolsLayout, "已切换为英文模式", Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(mToolsLayout, R.string.string_en_done, Snackbar.LENGTH_SHORT).show();
         } else {
             Common.saveLanguage(this, 0);
-            Snackbar.make(toolsLayout, "已切换为中文模式", Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(mToolsLayout, R.string.string_chinese_done, Snackbar.LENGTH_SHORT).show();
         }
         textView.setText(Common.getDisplayLanguage(this));
     }
 
+    /**
+     * 处理图片旋转
+     */
     @OnClick(R.id.rotationTv)
     void rotation() {
         if (!isReady) {
-            Snackbar.make(btnStart, "图片资源为空,操作不能进行", Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(mStartBtn, "图片资源为空,操作不能进行", Snackbar.LENGTH_SHORT).show();
             return;
         }
-        Bitmap bitmap = ((BitmapDrawable) ivSrc.getDrawable()).getBitmap();
-        ivSrc.setImageBitmap(BitmapUtils.rotateBitmap(bitmap, 90f));
+        Bitmap bitmap = ((BitmapDrawable) mSrcIv.getDrawable()).getBitmap();
+        mSrcIv.setImageBitmap(BitmapUtils.rotateBitmap(bitmap, 90f));
     }
 
-    private void itemSelected(TextView view) {
-        originToolTv.setSelected(false);
-        heibaiToolTv.setSelected(false);
-        grayToolTv.setSelected(false);
-        binaryToolTv.setSelected(false);
-
+    private void itemSelected(View view) {
+        for (int i = 0; i < mToolsLayout.getChildCount(); i++) {
+            mToolsLayout.getChildAt(i).setSelected(false);
+        }
         view.setSelected(true);
     }
 
+    /**
+     * 过去初始化图片
+     *
+     * @return bitmap
+     */
     private Bitmap getOriginBitmap() {
         try {
-            return BitmapFactory.decodeStream(getContentResolver().openInputStream(tempUri));
+            return BitmapFactory.decodeStream(getContentResolver().openInputStream(mTempUri));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
             return null;
@@ -312,11 +325,11 @@ public class RecognitionActivity extends AppCompatActivity {
         @Override
         public void run() {
             if (originBitmap == null) {
-                scanFailed("图片为空");
+                scanFailed(getString(R.string.string_null_pic_single));
                 return;
             }
             if (originBitmap.getConfig() != Bitmap.Config.ARGB_8888) {
-                scanFailed("图片非ARGB_8888格式");
+                scanFailed(getString(R.string.string_pic_not_a888));
                 return;
             }
             try {
@@ -340,8 +353,8 @@ public class RecognitionActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        if ("Data path must contain subfolder tessdata!".equals(e.getMessage())) {
-                            scanFailed("字典文件没有准备好");
+                        if (getString(R.string.error_tessdata_folder).equals(e.getMessage())) {
+                            scanFailed(getString(R.string.string_tess_not_ready));
                         } else {
                             scanFailed(e.getMessage());
                         }
@@ -361,7 +374,7 @@ public class RecognitionActivity extends AppCompatActivity {
         BitmapResolveRunnable(Bitmap origin, int type) {
             this.origin = origin;
             this.type = type;
-            progressBar.setVisibility(View.VISIBLE);
+            mProgressBar.setVisibility(View.VISIBLE);
         }
 
         @Override
@@ -369,7 +382,7 @@ public class RecognitionActivity extends AppCompatActivity {
             final Bitmap bitmap;
             switch (type) {
                 case R.id.originToolTv:
-                    bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.img_avatar);
+                    bitmap = getOriginBitmap();
                     break;
                 case R.id.heibaiToolTv:
                     bitmap = BitmapUtils.turnBlackWhite(origin);
@@ -388,8 +401,8 @@ public class RecognitionActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        ivSrc.setImageBitmap(bitmap);
-                        progressBar.setVisibility(View.GONE);
+                        mSrcIv.setImageBitmap(bitmap);
+                        mProgressBar.setVisibility(View.GONE);
                     }
                 });
             }
