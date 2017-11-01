@@ -46,9 +46,10 @@ public class ResultActivity extends AppCompatActivity {
     ImageButton deleteBtn;
     private History history;
     private static final int STATUS_NONE = 0;
-    private static final int STATUS_MODIFY = 1;
-    private static final int TYPE_DATA = 2;
-    private static final int TYPE_VIEW = 3;
+    public static final int STATUS_MODIFY = 1;
+    public static final int STATUS_DELETE = 2;
+    private static final int TYPE_DATA = 3;
+    private static final int TYPE_VIEW = 4;
     private boolean isDelete;
     private int currentStatus = STATUS_NONE;
     private int currentType = -1;
@@ -89,7 +90,7 @@ public class ResultActivity extends AppCompatActivity {
     private void showData() {
         long id = getIntent().getLongExtra("id", -1);
         if (id != -1) {
-            history = new HistoryDatabase(this).find(id);
+            history = HistoryDatabase.get(this).find(id);
             currentType = TYPE_VIEW;
         } else {
             history = (History) getIntent().getSerializableExtra("data");
@@ -120,12 +121,13 @@ public class ResultActivity extends AppCompatActivity {
     }
 
     @OnClick(R.id.deleteBtn)
-    void delete(View view) {
+    void delete() {
         // don't save and finish.
         if (history != null && currentType == TYPE_VIEW) {
-            new HistoryDatabase(this).remove(history.getId());
+            HistoryDatabase.get(this).remove(history.getId());
         }
         isDelete = true;
+        setResult(STATUS_DELETE);
         ResultActivity.this.finish();
     }
 
@@ -165,17 +167,25 @@ public class ResultActivity extends AppCompatActivity {
     }
 
     private void update() {
-        new HistoryDatabase(this).update(history.getId(), resultEt.getText().toString());
-//        setResult();
+        HistoryDatabase.get(this).update(history.getId(), resultEt.getText().toString());
+        Toast.makeText(this, "记录已更新", Toast.LENGTH_SHORT).show();
     }
 
     private void save() {
         history.setResult(resultEt.getText().toString());
-        long id = new HistoryDatabase(this).add(history);
+        long id = HistoryDatabase.get(this).add(history);
         if (id > 0) {
             Toast.makeText(this, "数据已保存", Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(this, "数据未保存", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (currentStatus == STATUS_MODIFY) {
+            setResult(STATUS_MODIFY);
+        }
+        super.onBackPressed();
     }
 }

@@ -16,20 +16,19 @@ import android.widget.Filterable;
  * @author shenhua
  *         Email shenhuanet@126.com
  */
-abstract class RecyclerViewCursorAdapter<VH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<VH> implements Filterable,
+public abstract class BaseRecyclerCursorAdapter<VH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<VH> implements Filterable,
         CursorFilter.CursorFilterClient {
 
     /**
      * Call when bind view with the cursor
      *
-     * @param holder
-     * @param cursor
+     * @param holder holder
+     * @param cursor cursor
      */
     public abstract void onBindViewHolder(VH holder, Cursor cursor);
 
     /**
      * This field should be made private, so it is hidden from the SDK.
-     * {@hide}
      */
     protected boolean mDataValid;
 
@@ -90,7 +89,7 @@ abstract class RecyclerViewCursorAdapter<VH extends RecyclerView.ViewHolder> ext
      * @param flags   Flags used to determine the behavior of the adapter;
      *                Currently it accept {@link #FLAG_REGISTER_CONTENT_OBSERVER}.
      */
-    RecyclerViewCursorAdapter(Context context, Cursor c, int flags) {
+    BaseRecyclerCursorAdapter(Context context, Cursor c, int flags) {
         init(context, c, flags);
     }
 
@@ -319,6 +318,10 @@ abstract class RecyclerViewCursorAdapter<VH extends RecyclerView.ViewHolder> ext
      */
     protected abstract void onContentChanged();
 
+    public void onItemRemoved(int item) {
+        notifyItemRemoved(item);
+    }
+
     private class ChangeObserver extends ContentObserver {
         public ChangeObserver() {
             super(new Handler());
@@ -346,7 +349,6 @@ abstract class RecyclerViewCursorAdapter<VH extends RecyclerView.ViewHolder> ext
         public void onInvalidated() {
             mDataValid = false;
             notifyDataSetChanged();
-            // notifyDataSetInvalidated();
         }
     }
 }

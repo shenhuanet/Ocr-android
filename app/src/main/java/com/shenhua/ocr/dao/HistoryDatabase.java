@@ -28,8 +28,21 @@ public class HistoryDatabase extends SQLiteOpenHelper {
     public static final String KEY_IMG = "_image";
     public static final String KEY_UPDATE = "_update";
 
-    public HistoryDatabase(Context context) {
+    private HistoryDatabase(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
+    }
+
+    private static HistoryDatabase sInstance = null;
+
+    public static HistoryDatabase get(Context context) {
+        if (sInstance == null) {
+            synchronized (HistoryDatabase.class) {
+                if (sInstance == null) {
+                    sInstance = new HistoryDatabase(context);
+                }
+            }
+        }
+        return sInstance;
     }
 
     @Override
@@ -83,11 +96,11 @@ public class HistoryDatabase extends SQLiteOpenHelper {
      */
     public void update(long id, String result) {
         ContentValues cv = new ContentValues();
-        cv.put(KEY_RESULT,result);
-        cv.put(KEY_UPDATE,System.currentTimeMillis());
-        String where =  KEY_ID + "=?";
+        cv.put(KEY_RESULT, result);
+        cv.put(KEY_UPDATE, System.currentTimeMillis());
+        String where = KEY_ID + "=?";
         String[] whereValues = {Long.toString(id)};
-        getWritableDatabase().update(TABLE_NAME,cv,where,whereValues);
+        getWritableDatabase().update(TABLE_NAME, cv, where, whereValues);
     }
 
     /**
@@ -95,11 +108,10 @@ public class HistoryDatabase extends SQLiteOpenHelper {
      *
      * @param id _id
      */
-    public void remove(long id) {
-        getWritableDatabase().execSQL("DELETE FROM " + TABLE_NAME + " where " + KEY_ID + "='" + id + "';");
-        // String where = KEY_ID + "=?";
-        // String[] whereValues = {String.valueOf(id)};;
-        // getWritableDatabase().delete(TABLE_NAME, where, whereValues);
+    public int remove(long id) {
+        String where = KEY_ID + "=?";
+        String[] whereValues = {String.valueOf(id)};
+        return getWritableDatabase().delete(TABLE_NAME, where, whereValues);
     }
 
     /**

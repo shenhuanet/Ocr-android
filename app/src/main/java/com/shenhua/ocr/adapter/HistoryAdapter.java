@@ -3,6 +3,7 @@ package com.shenhua.ocr.adapter;
 import android.content.Context;
 import android.database.Cursor;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,9 +24,10 @@ import butterknife.ButterKnife;
  * @author shenhua
  *         Email shenhuanet@126.com
  */
-public class HistoryAdapter extends RecyclerViewCursorAdapter<HistoryAdapter.ResultViewHolder> {
+public class HistoryAdapter extends BaseRecyclerCursorAdapter<HistoryAdapter.ResultViewHolder> {
 
-    private OnClickListener listener;
+    private OnClickListener onClickListener;
+    private OnLongClickListener onLongClickListener;
 
     /**
      * Recommended constructor.
@@ -40,6 +42,30 @@ public class HistoryAdapter extends RecyclerViewCursorAdapter<HistoryAdapter.Res
     }
 
     @Override
+    public ResultViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_history, parent, false);
+        final ResultViewHolder holder = new ResultViewHolder(view);
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (onClickListener != null) {
+                    onClickListener.onClick(holder.getLayoutPosition(), (Long) v.getTag());
+                }
+            }
+        });
+        holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                if (onLongClickListener != null) {
+                    onLongClickListener.onLongClick(holder.getLayoutPosition(), (Long) v.getTag());
+                }
+                return true;
+            }
+        });
+        return holder;
+    }
+
+    @Override
     public void onBindViewHolder(ResultViewHolder holder, Cursor cursor) {
         holder.itemView.setTag(cursor.getLong(cursor.getColumnIndex(HistoryDatabase.KEY_ID)));
         holder.contentTv.setText(cursor.getString(cursor.getColumnIndex(HistoryDatabase.KEY_RESULT)));
@@ -50,25 +76,15 @@ public class HistoryAdapter extends RecyclerViewCursorAdapter<HistoryAdapter.Res
 
     @Override
     protected void onContentChanged() {
-    }
-
-    @Override
-    public ResultViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_history, parent, false);
-        final ResultViewHolder holder = new ResultViewHolder(view);
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (listener != null) {
-                    listener.onClick(holder.getLayoutPosition(), (Long) v.getTag());
-                }
-            }
-        });
-        return holder;
+        Log.d("shenhuaLog -- " + HistoryAdapter.class.getSimpleName(), "onContentChanged: ");
     }
 
     public void setOnClickListener(OnClickListener listener) {
-        this.listener = listener;
+        this.onClickListener = listener;
+    }
+
+    public void setOnLongClickListener(OnLongClickListener onLongClickListener) {
+        this.onLongClickListener = onLongClickListener;
     }
 
     static class ResultViewHolder extends RecyclerView.ViewHolder {
@@ -96,5 +112,15 @@ public class HistoryAdapter extends RecyclerViewCursorAdapter<HistoryAdapter.Res
          * @param id       cursor id
          */
         void onClick(int position, long id);
+    }
+
+    public interface OnLongClickListener {
+        /**
+         * when user long click the item.
+         *
+         * @param position position
+         * @param id       cursor id
+         */
+        void onLongClick(int position, long id);
     }
 }
