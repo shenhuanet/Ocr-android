@@ -97,4 +97,9 @@ public class MainActivity extends AppCompatActivity implements UserFragment.Call
     public void onCallback(String msg) {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
 }

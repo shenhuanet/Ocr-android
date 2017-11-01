@@ -9,6 +9,12 @@
         <item name="android:textColorPrimary">@android:color/white</item>
     </style>
 
+    <style name="AppThemeTranslucent" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- Customize your theme here. -->
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowIsTranslucent">true</item>
+    </style>
+
     <style name="ToolbarStyle">
         <item name="colorControlNormal">@android:color/white</item>
     </style>
@@ -36,6 +42,7 @@
         <item name="android:layout_width">@dimen/size_50dp</item>
         <item name="android:layout_height">@dimen/size_50dp</item>
     </style>
+
     <style name="ImageButtonStyle.60">
         <item name="android:layout_width">@dimen/size_60dp</item>
         <item name="android:layout_height">@dimen/size_60dp</item>
@@ -57,7 +64,8 @@
         <item name="android:layout_width">@dimen/tool_size</item>
         <item name="android:layout_height">@dimen/tool_size</item>
         <item name="android:gravity">center</item>
-        <item name="android:foreground">@drawable/bg_tool_selector</item>
+        <item name="android:clickable">true</item>
+        <item name="android:background">@drawable/bg_tool_selector</item>
         <item name="android:padding">5dp</item>
         <item name="android:textColor">@android:color/white</item>
     </style>

@@ -16,7 +16,7 @@ import android.widget.Filterable;
  * @author shenhua
  *         Email shenhuanet@126.com
  */
-public abstract class RecyclerViewCursorAdapter<VH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<VH> implements Filterable,
+abstract class RecyclerViewCursorAdapter<VH extends RecyclerView.ViewHolder> extends RecyclerView.Adapter<VH> implements Filterable,
         CursorFilter.CursorFilterClient {
 
     /**

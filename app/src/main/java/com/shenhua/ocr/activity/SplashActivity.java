@@ -126,7 +126,6 @@ public class SplashActivity extends AppCompatActivity {
             } else {
                 publishProgress("拷贝: " + src + " ...");
                 File outFile = new File(dest);
-                Log.d("shenhuaLog -- " + CopyFiles.class.getSimpleName(), "copy: >>> " + outFile);
                 InputStream is = context.getAssets().open(src);
                 FileOutputStream fos = new FileOutputStream(outFile);
                 byte[] buffer = new byte[1024];

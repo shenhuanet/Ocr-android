@@ -106,17 +106,17 @@ public class ResultActivity extends AppCompatActivity {
 
     @OnClick(R.id.outputBtn)
     void output(View view) {
-
+// TODO: 2017-11-01-0001
     }
 
     @OnClick(R.id.copyBtn)
     void copy(View view) {
-
+// TODO: 2017-11-01-0001
     }
 
     @OnClick(R.id.shareBtn)
     void share(View view) {
-
+// TODO: 2017-11-01-0001
     }
 
     @OnClick(R.id.deleteBtn)

@@ -1,9 +1,6 @@
 package com.shenhua.ocr.widget;
 
-import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
-import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.graphics.ImageFormat;
 import android.graphics.Matrix;
@@ -25,14 +22,13 @@ import android.media.ImageReader;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.Size;
 import android.util.SparseIntArray;
 import android.view.Surface;
 import android.view.TextureView;
-import android.widget.Toast;
+import android.view.WindowManager;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -100,7 +96,6 @@ public class CameraPreview extends TextureView {
      * 使用信号量 Semaphore 进行多线程任务调度
      */
     private Semaphore mCameraOpenCloseLock = new Semaphore(1);
-    private Activity activity;
     private File mFile;
     private HandlerThread mBackgroundThread;
     private Handler mBackgroundHandler;
@@ -111,6 +106,7 @@ public class CameraPreview extends TextureView {
     private CaptureRequest mPreviewRequest;
     private CameraCaptureSession mCaptureSession;
     private ImageReader mImageReader;
+    private CapturePictureListener mCapturePictureListener;
 
     static {
         ORIENTATIONS.append(Surface.ROTATION_0, 90);
@@ -129,7 +125,7 @@ public class CameraPreview extends TextureView {
 
     public CameraPreview(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        mFile = new File(getContext().getExternalFilesDir(null), "pic.jpg");
+        mFile = new File(getContext().getFilesDir(), "pic.jpg");
     }
 
     @Override
@@ -148,10 +144,9 @@ public class CameraPreview extends TextureView {
         }
     }
 
-    public void onResume(Activity activity) {
-        this.activity = activity;
+    public void onResume() {
         startBackgroundThread();
-        //当Activity或Fragment OnResume()时,可以冲洗打开一个相机并开始预览,否则,这个Surface已经准备就绪
+        //当Activity或Fragment OnResume()时,可以打开一个相机并开始预览,否则,这个Surface已经准备就绪
         if (this.isAvailable()) {
             openCamera(this.getWidth(), this.getHeight());
         } else {
@@ -162,6 +157,9 @@ public class CameraPreview extends TextureView {
     public void onPause() {
         closeCamera();
         stopBackgroundThread();
+        // 防止在onPause后会触发 onSurfaceTextureAvailable 然后自动再次打开相机
+        // 在onResume时不能获得相机许可,相机被自动触发的信号量占用
+        setSurfaceTextureListener(null);
     }
 
     public void setOutPutDir(File file) {
@@ -184,7 +182,8 @@ public class CameraPreview extends TextureView {
         }
     }
 
-    public void takePicture() {
+    public void takePicture(CapturePictureListener capturePictureListener) {
+        this.mCapturePictureListener = capturePictureListener;
         lockFocus();
     }
 
@@ -208,7 +207,7 @@ public class CameraPreview extends TextureView {
     /**
      * 处理生命周期内的回调事件
      */
-    private final TextureView.SurfaceTextureListener mSurfaceTextureListener = new TextureView.SurfaceTextureListener() {
+    private TextureView.SurfaceTextureListener mSurfaceTextureListener = new TextureView.SurfaceTextureListener() {
 
         @Override
         public void onSurfaceTextureAvailable(SurfaceTexture texture, int width, int height) {
@@ -238,9 +237,13 @@ public class CameraPreview extends TextureView {
         @Override
         public void onOpened(@NonNull CameraDevice cameraDevice) {
             mCameraOpenCloseLock.release();
-            Log.d(TAG, "相机已打开");
             mCameraDevice = cameraDevice;
             createCameraPreviewSession();
+        }
+
+        @Override
+        public void onClosed(@NonNull CameraDevice camera) {
+            super.onClosed(camera);
         }
 
         @Override
@@ -255,9 +258,6 @@ public class CameraPreview extends TextureView {
             mCameraOpenCloseLock.release();
             cameraDevice.close();
             mCameraDevice = null;
-            if (null != activity) {
-                activity.finish();
-            }
         }
     };
 
@@ -332,10 +332,10 @@ public class CameraPreview extends TextureView {
      * @param viewHeight 高
      */
     private void configureTransform(int viewWidth, int viewHeight) {
-        if (null == mPreviewSize || null == activity) {
+        if (null == mPreviewSize) {
             return;
         }
-        int rotation = activity.getWindowManager().getDefaultDisplay().getRotation();
+        int rotation = getDisplayRotation();
         Matrix matrix = new Matrix();
         RectF viewRect = new RectF(0, 0, viewWidth, viewHeight);
         RectF bufferRect = new RectF(0, 0, mPreviewSize.getHeight(), mPreviewSize.getWidth());
@@ -363,13 +363,9 @@ public class CameraPreview extends TextureView {
         configureTransform(width, height);
         CameraManager manager = (CameraManager) getContext().getSystemService(Context.CAMERA_SERVICE);
         try {
-            int timeOut = 2500;
+            int timeOut = 200;
             if (!mCameraOpenCloseLock.tryAcquire(timeOut, TimeUnit.MILLISECONDS)) {
                 throw new RuntimeException("Time out waiting to lock camera opening.");
-            }
-            if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                Toast.makeText(activity, "请在调用OnResume()方法前请求运行时权限!", Toast.LENGTH_SHORT).show();
-                return;
             }
             manager.openCamera(mCameraId, mStateCallback, mBackgroundHandler);
         } catch (CameraAccessException e) {
@@ -397,7 +393,7 @@ public class CameraPreview extends TextureView {
                 mImageReader.close();
                 mImageReader = null;
             }
-        } catch (InterruptedException e) {
+        } catch (Exception e) {
             throw new RuntimeException("Interrupted while trying to lock camera closing.", e);
         } finally {
             mCameraOpenCloseLock.release();
@@ -433,12 +429,11 @@ public class CameraPreview extends TextureView {
                         ImageFormat.JPEG, 2);
                 mImageReader.setOnImageAvailableListener(
                         mOnImageAvailableListener, mBackgroundHandler);
-
-                int displayRotation = activity.getWindowManager().getDefaultDisplay().getRotation();
                 // noinspection ConstantConditions
                 mSensorOrientation = characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);
                 boolean swappedDimensions = false;
-                switch (displayRotation) {
+                int rotation = getDisplayRotation();
+                switch (rotation) {
                     case Surface.ROTATION_0:
                     case Surface.ROTATION_180:
                         if (mSensorOrientation == 90 || mSensorOrientation == 270) {
@@ -452,11 +447,12 @@ public class CameraPreview extends TextureView {
                         }
                         break;
                     default:
-                        Log.e(TAG, "Display rotation is invalid: " + displayRotation);
+                        Log.e(TAG, "Display rotation is invalid: " + rotation);
                 }
 
                 Point displaySize = new Point();
-                activity.getWindowManager().getDefaultDisplay().getSize(displaySize);
+                WindowManager wm = (WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE);
+                wm.getDefaultDisplay().getSize(displaySize);
                 int rotatedPreviewWidth = width;
                 int rotatedPreviewHeight = height;
                 int maxPreviewWidth = displaySize.x;
@@ -544,39 +540,40 @@ public class CameraPreview extends TextureView {
     private void createCameraPreviewSession() {
         try {
             SurfaceTexture texture = this.getSurfaceTexture();
-            assert texture != null;
-            // 将默认缓冲区的大小配置为想要的相机预览的大小
-            texture.setDefaultBufferSize(mPreviewSize.getWidth(), mPreviewSize.getHeight());
-            Surface surface = new Surface(texture);
-            mPreviewRequestBuilder = mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
-            mPreviewRequestBuilder.addTarget(surface);
-            // 我们创建一个 CameraCaptureSession 来进行相机预览
-            mCameraDevice.createCaptureSession(Arrays.asList(surface, mImageReader.getSurface()),
-                    new CameraCaptureSession.StateCallback() {
+            if (texture != null) {
+                // 将默认缓冲区的大小配置为想要的相机预览的大小
+                texture.setDefaultBufferSize(mPreviewSize.getWidth(), mPreviewSize.getHeight());
+                Surface surface = new Surface(texture);
+                mPreviewRequestBuilder = mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+                mPreviewRequestBuilder.addTarget(surface);
+                // 我们创建一个 CameraCaptureSession 来进行相机预览
+                mCameraDevice.createCaptureSession(Arrays.asList(surface, mImageReader.getSurface()),
+                        new CameraCaptureSession.StateCallback() {
 
-                        @Override
-                        public void onConfigured(@NonNull CameraCaptureSession cameraCaptureSession) {
-                            if (null == mCameraDevice) {
-                                return;
+                            @Override
+                            public void onConfigured(@NonNull CameraCaptureSession cameraCaptureSession) {
+                                if (null == mCameraDevice) {
+                                    return;
+                                }
+                                // 会话准备好后，我们开始显示预览
+                                mCaptureSession = cameraCaptureSession;
+                                try {
+                                    mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE,
+                                            CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE);
+                                    setAutoFlash(mPreviewRequestBuilder);
+                                    mPreviewRequest = mPreviewRequestBuilder.build();
+                                    mCaptureSession.setRepeatingRequest(mPreviewRequest, mCaptureCallback, mBackgroundHandler);
+                                } catch (CameraAccessException e) {
+                                    e.printStackTrace();
+                                }
                             }
-                            // 会话准备好后，我们开始显示预览
-                            mCaptureSession = cameraCaptureSession;
-                            try {
-                                mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE,
-                                        CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE);
-                                setAutoFlash(mPreviewRequestBuilder);
-                                mPreviewRequest = mPreviewRequestBuilder.build();
-                                mCaptureSession.setRepeatingRequest(mPreviewRequest, mCaptureCallback, mBackgroundHandler);
-                            } catch (CameraAccessException e) {
-                                e.printStackTrace();
-                            }
-                        }
 
-                        @Override
-                        public void onConfigureFailed(@NonNull CameraCaptureSession cameraCaptureSession) {
-                        }
-                    }, null);
-        } catch (CameraAccessException e) {
+                            @Override
+                            public void onConfigureFailed(@NonNull CameraCaptureSession cameraCaptureSession) {
+                            }
+                        }, null);
+            }
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -628,10 +625,10 @@ public class CameraPreview extends TextureView {
      * 拍摄静态图片
      */
     private void captureStillPicture() {
+        if (null == mCameraDevice) {
+            return;
+        }
         try {
-            if (null == activity || null == mCameraDevice) {
-                return;
-            }
             final CaptureRequest.Builder captureBuilder =
                     mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
             captureBuilder.addTarget(mImageReader.getSurface());
@@ -639,7 +636,7 @@ public class CameraPreview extends TextureView {
                     CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE);
             setAutoFlash(captureBuilder);
             // 方向
-            int rotation = activity.getWindowManager().getDefaultDisplay().getRotation();
+            int rotation = getDisplayRotation();
             captureBuilder.set(CaptureRequest.JPEG_ORIENTATION, getOrientation(rotation));
             CameraCaptureSession.CaptureCallback captureCallback
                     = new CameraCaptureSession.CaptureCallback() {
@@ -648,9 +645,10 @@ public class CameraPreview extends TextureView {
                 public void onCaptureCompleted(@NonNull CameraCaptureSession session,
                                                @NonNull CaptureRequest request,
                                                @NonNull TotalCaptureResult result) {
-                    Toast.makeText(getContext(), "Saved: " + mFile, Toast.LENGTH_SHORT).show();
-                    Log.d(TAG, mFile.toString());
                     unlockFocus();
+                    if (mCapturePictureListener != null) {
+                        mCapturePictureListener.onCapture(mFile);
+                    }
                 }
             };
             mCaptureSession.stopRepeating();
@@ -659,6 +657,11 @@ public class CameraPreview extends TextureView {
         } catch (CameraAccessException e) {
             e.printStackTrace();
         }
+    }
+
+    private int getDisplayRotation() {
+        WindowManager wm = (WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE);
+        return wm.getDefaultDisplay().getRotation();
     }
 
     /**
@@ -735,6 +738,15 @@ public class CameraPreview extends TextureView {
                 }
             }
         }
+    }
+
+    public interface CapturePictureListener {
+        /**
+         * 拍照完成回调
+         *
+         * @param file 照片保存位置
+         */
+        void onCapture(File file);
     }
 
 }
