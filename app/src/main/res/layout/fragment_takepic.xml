@@ -28,7 +28,7 @@
             android:gravity="center"
             android:contentDescription="@null"
             android:padding="3dp"
-            android:src="@drawable/ic_album" />
+            android:src="@drawable/ic_scan_album" />
 
         <ImageButton
             android:id="@+id/captureBtn"
@@ -37,7 +37,7 @@
             android:layout_height="80dp"
             android:contentDescription="@null"
             android:layout_centerInParent="true"
-            android:src="@drawable/ic_capture_200px"/>
+            android:src="@drawable/ic_scan_capture"/>
 
         <ImageButton
             android:id="@+id/backBtn"
@@ -46,7 +46,7 @@
             android:contentDescription="@null"
             android:layout_marginStart="@dimen/size_50dp"
             android:layout_toEndOf="@+id/captureBtn"
-            android:src="@drawable/ic_back_200px" />
+            android:src="@drawable/ic_back" />
 
     </RelativeLayout>
 

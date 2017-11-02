@@ -7,6 +7,7 @@
     android:background="@color/colorPrimaryDark"
     android:minHeight="?attr/actionBarSize"
     android:paddingTop="@dimen/toolbar_top"
+    app:contentInsetStartWithNavigation="0dp"
     app:popupTheme="@style/ToolbarPopupStyle"
     app:theme="@style/ToolbarStyle"
     app:title="@string/app_name"

@@ -6,6 +6,8 @@
     android:orientation="vertical"
     tools:context="com.shenhua.ocr.activity.MainActivity">
 
+    <include layout="@layout/view_toolbar" />
+
     <FrameLayout
         android:id="@+id/fragment_container"
         android:layout_width="match_parent"
@@ -33,13 +35,15 @@
                 android:layout_margin="@dimen/size_margin"
                 android:contentDescription="@null"
                 android:padding="3dp"
-                android:src="@drawable/ic_account_circle_48px" />
+                android:src="@drawable/ic_home_account" />
 
             <FrameLayout
                 android:layout_width="@dimen/size_100dp"
                 android:layout_height="@dimen/size_100dp"
                 android:layout_gravity="center"
-                android:layout_marginBottom="@dimen/size_margin">
+                android:layout_marginBottom="@dimen/size_margin"
+                android:elevation="80dp"
+                android:outlineProvider="bounds">
 
                 <ImageButton
                     android:id="@+id/startBtn"
@@ -47,7 +51,7 @@
                     android:layout_width="@dimen/size_100dp"
                     android:layout_height="@dimen/size_100dp"
                     android:contentDescription="@null"
-                    android:src="@drawable/shape_btn_start" />
+                    android:src="@drawable/shape_circle_start" />
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -66,7 +70,7 @@
                 android:layout_gravity="bottom|end"
                 android:layout_margin="@dimen/size_margin"
                 android:contentDescription="@null"
-                android:src="@drawable/ic_history_48px" />
+                android:src="@drawable/ic_home_history" />
 
         </FrameLayout>
 

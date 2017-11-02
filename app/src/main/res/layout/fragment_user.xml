@@ -1,18 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
-
-    <include layout="@layout/view_toolbar" />
 
     <ImageView
         android:id="@+id/avatarIv"
         android:layout_width="@dimen/size_80dp"
         android:layout_height="@dimen/size_80dp"
         android:layout_gravity="center"
-        android:layout_marginTop="@dimen/size_margin"
+        android:layout_marginTop="@dimen/content_top"
         android:contentDescription="@string/app_name"
         android:scaleType="centerCrop" />
+
+    <android.support.v7.widget.LinearLayoutCompat
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:orientation="vertical"
+        app:divider="@drawable/bg_divider_gray"
+        app:dividerPadding="20dp"
+        app:showDividers="middle">
+
+        <TextView
+            android:id="@+id/userSettingTv"
+            style="@style/SettingItemStyle"
+            android:drawableStart="@drawable/ic_setting_user"
+            android:text="@string/string_setting_user" />
+
+        <TextView
+            android:id="@+id/cacheTv"
+            style="@style/SettingItemStyle"
+            android:drawableStart="@drawable/ic_setting_clean_cache"
+            android:text="@string/string_setting_cache" />
+
+        <TextView
+            android:id="@+id/deleteTv"
+            style="@style/SettingItemStyle"
+            android:drawableStart="@drawable/ic_setting_clean_all"
+            android:text="@string/string_setting_delete" />
+
+        <TextView
+            android:id="@+id/feedbackTv"
+            style="@style/SettingItemStyle"
+            android:drawableStart="@drawable/ic_setting_feedback"
+            android:text="@string/string_setting_feedback" />
+
+        <TextView
+            android:id="@+id/updateTv"
+            style="@style/SettingItemStyle"
+            android:drawableStart="@drawable/ic_setting_update"
+            android:text="@string/string_setting_update" />
+
+        <TextView
+            android:id="@+id/aboutTv"
+            style="@style/SettingItemStyle"
+            android:drawableStart="@drawable/ic_setting_about"
+            android:text="@string/string_setting_about" />
+
+    </android.support.v7.widget.LinearLayoutCompat>
 
 </LinearLayout>

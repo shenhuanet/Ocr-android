@@ -1,32 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
+    android:layout_width="wrap_content"
     android:layout_height="match_parent"
+    android:layout_gravity="center"
+    android:layout_marginBottom="@dimen/panel_height"
+    android:layout_marginTop="@dimen/content_top"
+    android:gravity="center"
     android:orientation="vertical">
 
-    <include layout="@layout/view_toolbar" />
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
+    <ImageView
+        android:layout_width="@dimen/size_50dp"
+        android:layout_height="@dimen/size_50dp"
         android:layout_gravity="center"
-        android:layout_marginBottom="@dimen/panel_height"
-        android:gravity="center"
-        android:orientation="vertical">
+        android:contentDescription="@string/app_name"
+        android:src="@drawable/img_wave_welcome" />
 
-        <ImageView
-            android:layout_width="@dimen/size_50dp"
-            android:layout_height="@dimen/size_50dp"
-            android:layout_gravity="center"
-            android:contentDescription="@string/app_name"
-            android:src="@drawable/ic_wave_welcome" />
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="@dimen/size_100dp"
-            android:contentDescription="@string/app_name"
-            android:src="@drawable/ic_welcome" />
-
-    </LinearLayout>
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/size_100dp"
+        android:contentDescription="@string/app_name"
+        android:src="@drawable/img_welcome" />
 
 </LinearLayout>

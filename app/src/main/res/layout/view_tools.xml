@@ -14,25 +14,25 @@
         <TextView
             android:id="@+id/originToolTv"
             style="@style/ToolItemsTextStyle"
-            android:drawableTop="@drawable/ic_tool_origin"
+            android:drawableTop="@drawable/img_tool_origin"
             android:text="@string/string_origin" />
 
         <TextView
             android:id="@+id/heibaiToolTv"
             style="@style/ToolItemsTextStyle"
-            android:drawableTop="@drawable/ic_tool_heibai"
+            android:drawableTop="@drawable/img_tool_heibai"
             android:text="@string/string_heibai" />
 
         <TextView
             android:id="@+id/grayToolTv"
             style="@style/ToolItemsTextStyle"
-            android:drawableTop="@drawable/ic_tool_gray"
+            android:drawableTop="@drawable/img_tool_gray"
             android:text="@string/string_gray" />
 
         <TextView
             android:id="@+id/binaryToolTv"
             style="@style/ToolItemsTextStyle"
-            android:drawableTop="@drawable/ic_tool_binary"
+            android:drawableTop="@drawable/img_tool_binary"
             android:text="@string/string_binary" />
 
     </LinearLayout>

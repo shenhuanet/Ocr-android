@@ -6,10 +6,12 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.shenhua.ocr.R;
 import com.shenhua.ocr.fragment.HistoryFragment;
@@ -17,6 +19,9 @@ import com.shenhua.ocr.fragment.HomeFragment;
 import com.shenhua.ocr.fragment.TakePicFragment;
 import com.shenhua.ocr.fragment.UserFragment;
 import com.shenhua.ocr.helper.ControlPanel;
+import com.shenhua.ocr.helper.ToolbarCallback;
+
+import java.util.Calendar;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -28,10 +33,14 @@ import butterknife.OnClick;
  * @author shenhua
  *         Email shenhuanet@126.com
  */
-public class MainActivity extends AppCompatActivity implements UserFragment.Callback {
+public class MainActivity extends AppCompatActivity implements ToolbarCallback {
 
     @BindView(R.id.layoutPanel)
     ViewGroup mLayoutPanel;
+    @BindView(R.id.toolbar)
+    Toolbar mToolbar;
+    private static final int CLICK_MIN_TIME = 1000;
+    private long mLastClickTime = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +52,7 @@ public class MainActivity extends AppCompatActivity implements UserFragment.Call
         }
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+        setSupportActionBar(mToolbar);
         ControlPanel.get().attachView(mLayoutPanel);
         getSupportFragmentManager().beginTransaction()
                 .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
@@ -60,6 +70,11 @@ public class MainActivity extends AppCompatActivity implements UserFragment.Call
 
     @OnClick({R.id.startBtn, R.id.accountBtn, R.id.historyBtn})
     void clicks(View view) {
+        // 防止双击
+        long currentTime = Calendar.getInstance().getTimeInMillis();
+        if (currentTime - mLastClickTime < CLICK_MIN_TIME) {
+            return;
+        }
         Fragment fragment = null;
         String name = null;
         switch (view.getId()) {
@@ -80,6 +95,7 @@ public class MainActivity extends AppCompatActivity implements UserFragment.Call
         }
         ControlPanel.get().collapse(mLayoutPanel);
         replaceFragment(fragment, name);
+        mLastClickTime = currentTime;
     }
 
     private void replaceFragment(Fragment fragment, String name) {
@@ -94,12 +110,35 @@ public class MainActivity extends AppCompatActivity implements UserFragment.Call
     }
 
     @Override
-    public void onCallback(String msg) {
-        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+    protected void onDestroy() {
+        super.onDestroy();
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            getSupportFragmentManager().popBackStack();
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onShow(String title) {
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setTitle(title);
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setDisplayShowHomeEnabled(true);
+        }
+    }
+
+    @Override
+    public void onHide() {
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setTitle(R.string.app_name);
+            actionBar.setDisplayHomeAsUpEnabled(false);
+            actionBar.setDisplayShowHomeEnabled(false);
+        }
     }
 }

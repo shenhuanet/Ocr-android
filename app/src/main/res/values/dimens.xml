@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="toolbar_top">0dp</dimen>
+    <dimen name="content_top">100dp</dimen>
 
     <dimen name="panel_height">180dp</dimen>
     <dimen name="tool_size">@dimen/size_60dp</dimen>

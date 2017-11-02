@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import java.io.File;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
@@ -106,10 +107,84 @@ public class Common {
 
     /**
      * 生成保存的图片路径
+     *
      * @return 路径
      */
     public static String getSaveFileName() {
         return "IMG_" + System.currentTimeMillis() + ".jpg";
+    }
+
+    /**
+     * 获取缓存大小
+     *
+     * @param context context
+     * @return 0KB/23MB
+     */
+    public static String getCacheSize(Context context) {
+        File cache = context.getCacheDir();
+        File exCache = context.getExternalCacheDir();
+        long size = getFolderSize(cache) + getFolderSize(exCache);
+        return formatSize(size);
+    }
+
+    /**
+     * 清理缓存
+     *
+     * @param context context
+     */
+    public static void cleanCache(Context context) {
+        File cache = context.getCacheDir();
+        File exCache = context.getExternalCacheDir();
+        deleteDir(cache);
+        deleteDir(exCache);
+    }
+
+    private static long getFolderSize(File file) {
+        long size = 0;
+        try {
+            File[] files = file.listFiles();
+            for (File file1 : files) {
+                if (file1.isDirectory()) {
+                    size = size + getFolderSize(file1);
+                } else {
+                    size = size + file1.length();
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return size;
+    }
+
+    private static String formatSize(long size) {
+        DecimalFormat df = new DecimalFormat("#.00");
+        String result;
+        if (size == 0) {
+            return "0KB";
+        }
+        if (size < 1024) {
+            result = df.format((double) size) + "B";
+        } else if (size < 1048576) {
+            result = df.format((double) size / 1024) + "KB";
+        } else if (size < 1073741824) {
+            result = df.format((double) size / 1048576) + "MB";
+        } else {
+            result = df.format((double) size / 1073741824) + "GB";
+        }
+        return result;
+    }
+
+    public static boolean deleteDir(File dir) {
+        if (dir == null) {
+            return true;
+        }
+        if (dir.isDirectory()) {
+            String[] list = dir.list();
+            for (String s : list) {
+                deleteDir(new File(dir, s));
+            }
+        }
+        return dir.delete();
     }
 
 }

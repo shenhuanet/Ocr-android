@@ -17,8 +17,8 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.shenhua.ocr.R;
-import com.shenhua.ocr.fragment.TakePicFragment;
 import com.shenhua.ocr.utils.Common;
+import com.shenhua.ocr.widget.PermissionDeclarationDialogFragment;
 
 import java.io.File;
 
@@ -110,7 +110,7 @@ public class ChoosePicActivity extends AppCompatActivity {
 
     private void requestStoragePermission() {
         if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-            new TakePicFragment.ConfirmationDialog().show(getSupportFragmentManager(), FRAGMENT_DIALOG);
+            new PermissionDeclarationDialogFragment().show(getSupportFragmentManager(), FRAGMENT_DIALOG);
         } else {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_STORAGE_PERMISSION);
         }

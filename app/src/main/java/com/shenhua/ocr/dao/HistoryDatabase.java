@@ -5,8 +5,10 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
+import com.shenhua.ocr.utils.Common;
+
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -111,6 +113,8 @@ public class HistoryDatabase extends SQLiteOpenHelper {
     public int remove(long id) {
         String where = KEY_ID + "=?";
         String[] whereValues = {String.valueOf(id)};
+        String path = find(id).getImg();
+        deleteFile(new File(path));
         return getWritableDatabase().delete(TABLE_NAME, where, whereValues);
     }
 
@@ -127,9 +131,10 @@ public class HistoryDatabase extends SQLiteOpenHelper {
      * 清空所有记录,使用异常捕获消除
      * {@link android.database.sqlite.SQLiteDatabaseLockedException}
      */
-    public void deleteAll() {
+    public void deleteAll(Context context) {
         try {
             getWritableDatabase().execSQL("DELETE FROM " + TABLE_NAME);
+            deleteFile(context.getExternalFilesDir(""));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -188,6 +193,10 @@ public class HistoryDatabase extends SQLiteOpenHelper {
         }
         cursor.close();
         return histories;
+    }
+
+    private void deleteFile(File file) {
+        Common.deleteDir(file);
     }
 
 }

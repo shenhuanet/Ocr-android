@@ -1,12 +1,9 @@
 <resources>
-    <string name="app_name">OCR-Android</string>
-
-    <string name="title_activity_splash">SplashActivity</string>
-    <string name="dummy_button">Dummy Button</string>
-    <string name="dummy_content">DUMMY\nCONTENT</string>
-
+    <string name="app_name">神话文字识别</string>
     <string name="string_start">开始</string>
+    <string name="string_sure">确定</string>
     <string name="string_cancel">取消</string>
+    <string name="string_alert">提示</string>
     <string name="string_do_handle">处理</string>
     <string name="string_rotation">翻转</string>
     <string name="string_chinese">中文</string>
@@ -35,12 +32,23 @@
     <string name="string_splash_start_copy">开始拷贝字典文件</string>
     <string name="string_splash_param_error">参数错误 params[1] is dest dir.</string>
     <string name="string_splash_copy_error">拷贝字典出错</string>
-    <string name="string_splash_copy">拷贝:</string>
+    <string name="string_splash_copy">检测:</string>
     <string name="string_delete_error">删除失败</string>
     <string name="string_viewer">查看</string>
     <string name="string_delete">删除</string>
     <string name="string_camera_permission">需要获取拍照权限,否则拍照功能无法使用</string>
     <string name="string_need_permission">需要获取用户权限</string>
     <string name="string_camera_unavailable">相机无法使用</string>
-
+    <string name="string_user">用户中心</string>
+    <string name="string_history">扫描历史</string>
+    <string name="string_setting_user">个人设置</string>
+    <string name="string_setting_cache">清除缓存 %s</string>
+    <string name="string_setting_delete">删除所有识别记录</string>
+    <string name="string_setting_feedback">意见反馈</string>
+    <string name="string_setting_feedback_hint">请输入反馈意见</string>
+    <string name="string_setting_update">检测更新</string>
+    <string name="string_setting_about">关于</string>
+    <string name="string_thanks">目前暂未开放,感谢继续关注本产品</string>
+    <string name="string_confirm_delete_all">确定要完全删除识别记录吗,删除后无法恢复</string>
+    <string name="string_copyright">版权所有 &#169; 2017 神话出品</string>
 </resources>

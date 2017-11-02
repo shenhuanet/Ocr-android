@@ -1,5 +1,6 @@
 package com.shenhua.ocr.fragment;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -9,12 +10,10 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -25,6 +24,7 @@ import com.shenhua.ocr.activity.ResultActivity;
 import com.shenhua.ocr.adapter.HistoryAdapter;
 import com.shenhua.ocr.dao.HistoryDatabase;
 import com.shenhua.ocr.dao.HistoryLoader;
+import com.shenhua.ocr.helper.ToolbarCallback;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -38,14 +38,29 @@ import butterknife.Unbinder;
  */
 public class HistoryFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    @BindView(R.id.toolbar)
-    Toolbar mToolbar;
     @BindView(R.id.recyclerView)
     RecyclerView recyclerView;
     private View mRootView;
     private Unbinder mUnBinder;
     private HistoryAdapter mHistoryAdapter;
     private static final int CURSOR_LOADER = 1;
+    private ToolbarCallback mCallback;
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context != null) {
+            mCallback = (ToolbarCallback) context;
+        }
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (mCallback != null) {
+            mCallback.onShow(getString(R.string.string_history));
+        }
+    }
 
     @Nullable
     @Override
@@ -58,13 +73,6 @@ public class HistoryFragment extends Fragment implements LoaderManager.LoaderCal
             parent.removeView(mRootView);
         }
         mUnBinder = ButterKnife.bind(this, mRootView);
-        ((AppCompatActivity) getActivity()).setSupportActionBar(mToolbar);
-        ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayShowHomeEnabled(true);
-            actionBar.setDisplayHomeAsUpEnabled(true);
-        }
-        setHasOptionsMenu(true);
         return mRootView;
     }
 
@@ -76,6 +84,7 @@ public class HistoryFragment extends Fragment implements LoaderManager.LoaderCal
             mHistoryAdapter = new HistoryAdapter(getContext(), null, 2);
         }
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(mHistoryAdapter);
         mHistoryAdapter.setOnClickListener(new HistoryAdapter.OnClickListener() {
             @Override
@@ -156,9 +165,17 @@ public class HistoryFragment extends Fragment implements LoaderManager.LoaderCal
     }
 
     @Override
+    public void onStop() {
+        super.onStop();
+    }
+
+    @Override
     public void onDestroyView() {
         super.onDestroyView();
         getLoaderManager().getLoader(CURSOR_LOADER).stopLoading();
+        if (mCallback != null) {
+            mCallback.onHide();
+        }
         mUnBinder.unbind();
     }
 

@@ -29,7 +29,7 @@
             android:paddingBottom="10dp"
             android:paddingTop="10dp"
             android:scaleType="fitXY"
-            android:src="@drawable/ic_scan_line"
+            android:src="@drawable/img_scan_line"
             android:visibility="gone" />
 
         <include layout="@layout/view_tools" />
@@ -40,7 +40,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="end"
             android:layout_marginTop="20dp"
-            android:background="@drawable/ic_rect"
+            android:background="@drawable/ic_notify_rect"
             android:gravity="center"
             android:visibility="gone">
 
@@ -48,7 +48,7 @@
                 android:id="@+id/scanTimer"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:drawableStart="@drawable/ic_notify"
+                android:drawableStart="@drawable/ic_notify_ding"
                 android:format="00:%s"
                 android:gravity="center"
                 android:textColor="@android:color/white"
@@ -84,7 +84,7 @@
                 android:id="@+id/startBtn"
                 style="@style/ImageButtonStyle.60"
                 android:contentDescription="@null"
-                android:src="@drawable/shape_btn_start" />
+                android:src="@drawable/shape_circle_start" />
 
             <TextView
                 android:id="@+id/startTv"

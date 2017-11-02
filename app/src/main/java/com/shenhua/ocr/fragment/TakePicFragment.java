@@ -2,9 +2,6 @@ package com.shenhua.ocr.fragment;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -12,7 +9,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
@@ -23,6 +19,7 @@ import android.widget.Toast;
 import com.shenhua.ocr.R;
 import com.shenhua.ocr.activity.ChoosePicActivity;
 import com.shenhua.ocr.widget.CameraPreview;
+import com.shenhua.ocr.widget.PermissionDeclarationDialogFragment;
 
 import java.io.File;
 
@@ -108,7 +105,7 @@ public class TakePicFragment extends Fragment implements ActivityCompat.OnReques
 
     private void requestCameraPermission() {
         if (shouldShowRequestPermissionRationale(Manifest.permission.CAMERA)) {
-            new ConfirmationDialog().show(getChildFragmentManager(), FRAGMENT_DIALOG);
+            new PermissionDeclarationDialogFragment().show(getChildFragmentManager(), FRAGMENT_DIALOG);
         } else {
             requestPermissions(new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
         }
@@ -141,35 +138,6 @@ public class TakePicFragment extends Fragment implements ActivityCompat.OnReques
             if (requestCode == REQUEST_PICK_PICTURE || requestCode == REQUEST_CROP_PICTURE) {
                 getFragmentManager().popBackStack();
             }
-        }
-    }
-
-    /**
-     * 授权dialog
-     */
-    public static class ConfirmationDialog extends DialogFragment {
-
-        @NonNull
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            final Fragment parent = getParentFragment();
-            return new AlertDialog.Builder(getActivity())
-                    .setMessage(R.string.string_need_permission)
-                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            parent.requestPermissions(new String[]{Manifest.permission.CAMERA},
-                                    REQUEST_CAMERA_PERMISSION);
-                        }
-                    })
-                    .setNegativeButton(android.R.string.cancel,
-                            new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    Toast.makeText(getContext(), R.string.string_camera_unavailable, Toast.LENGTH_SHORT).show();
-                                }
-                            })
-                    .create();
         }
     }
 

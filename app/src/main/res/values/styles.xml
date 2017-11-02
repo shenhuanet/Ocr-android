@@ -70,4 +70,16 @@
         <item name="android:textColor">@android:color/white</item>
     </style>
 
+    <style name="SettingItemStyle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:clickable">true</item>
+        <item name="android:background">?attr/selectableItemBackground</item>
+        <item name="android:drawablePadding">10dp</item>
+        <item name="android:minHeight">50dp</item>
+        <item name="android:padding">16dp</item>
+        <item name="android:textColor">@color/colorPrimaryText</item>
+    </style>
+
 </resources>

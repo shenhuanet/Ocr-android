@@ -20,7 +20,7 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:contentDescription="@null"
-            android:src="@drawable/ic_logo"
+            android:src="@drawable/img_logo"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintHorizontal_bias="0.368"
             app:layout_constraintLeft_toLeftOf="parent"
