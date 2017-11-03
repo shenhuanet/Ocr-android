@@ -14,7 +14,12 @@ import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.qq.e.ads.splash.SplashAD;
+import com.qq.e.ads.splash.SplashADListener;
+import com.qq.e.comm.util.AdError;
+import com.shenhua.ocr.BuildConfig;
 import com.shenhua.ocr.R;
+import com.shenhua.ocr.utils.Common;
 
 import net.youmi.android.AdManager;
 import net.youmi.android.nm.cm.ErrorCode;
@@ -39,11 +44,11 @@ import butterknife.ButterKnife;
  */
 public class SplashActivity extends AppCompatActivity {
 
+    private static final String TAG = "SplashActivity";
     @BindView(R.id.adView)
     RelativeLayout mAdView;
     @BindView(R.id.infoTv)
     TextView mInfoTv;
-    private boolean isReady;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,13 +58,130 @@ public class SplashActivity extends AppCompatActivity {
             getWindow().setStatusBarColor(Color.TRANSPARENT);
         }
         super.onCreate(savedInstanceState);
-        // AdManager.getInstance(this).init("e8f4d225e6c9b04a", "c649f87dae735c7b", true);
-        AdManager.getInstance(this).init("85aa56a59eac8b3d", "a14006f66f58d5d7", true);
         setContentView(R.layout.activity_splash);
         ButterKnife.bind(this);
+        if (BuildConfig.ENV_TYPE == 1) {
+            initGdtAD();
+        } else {
+            initYoumiAd();
+        }
+    }
 
-        preloadAd();
-        setupSplashAd();
+    private void initGdtAD() {
+        new SplashAD(this, mAdView, Common.TENCENT_APP_ID, Common.TENCENT_POS_ID, new SplashADListener() {
+            @Override
+            public void onADDismissed() {
+                Log.w(TAG, "onADDismissed: ");
+                nav(false);
+            }
+
+            @Override
+            public void onNoAD(AdError adError) {
+                Log.w(TAG, "onNoAD: " + adError.getErrorCode());
+                nav(true);
+            }
+
+            @Override
+            public void onADPresent() {
+                Log.w(TAG, "onADPresent: ");
+            }
+
+            @Override
+            public void onADClicked() {
+                Log.w(TAG, "onADClicked: ");
+            }
+
+            @Override
+            public void onADTick(long l) {
+                Log.w(TAG, "onADTick: " + Math.round(l / 1000f));
+            }
+        });
+    }
+
+    private void initYoumiAd() {
+        AdManager.getInstance(this).init(Common.YOUMI_APP_ID, Common.YOUMI_APP_SECRET, true);
+        /*
+         * 预加载ad,注意：不必每次展示插播ad前都请求，只需在应用启动时请求一次
+         */
+        SpotManager.getInstance(this).requestSpot(new SpotRequestListener() {
+            @Override
+            public void onRequestSuccess() {
+                Log.w(TAG, "onRequestSuccess: >> request success.");
+                // 应用安装后首次展示开屏会因为本地没有数据而跳过
+                // 如果开发者需要在首次也能展示开屏，可以在请求ad成功之前展示应用的logo，请求成功后再加载开屏
+                // setupSplashAd();
+            }
+
+            @Override
+            public void onRequestFailed(int errorCode) {
+                switch (errorCode) {
+                    case ErrorCode.NON_NETWORK:
+                        Log.w(TAG, "onRequestFailed: 网络异常");
+                        break;
+                    case ErrorCode.NON_AD:
+                        Log.w(TAG, "onRequestFailed: NO AD");
+                        break;
+                    default:
+                        break;
+                }
+            }
+        });
+        /*
+         * 设置开屏ad
+         */
+        RelativeLayout.LayoutParams params =
+                new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        params.addRule(RelativeLayout.ABOVE, R.id.adView);
+        // 对开屏进行设置
+        SplashViewSettings splashViewSettings = new SplashViewSettings();
+        splashViewSettings.setAutoJumpToTargetWhenShowFailed(false);
+        splashViewSettings.setTargetClass(MainActivity.class);
+        // 设置开屏的容器
+        splashViewSettings.setSplashViewContainer(mAdView);
+        // 展示开屏ad
+        SpotManager.getInstance(this)
+                .showSplash(this, splashViewSettings, new SpotListener() {
+
+                    @Override
+                    public void onShowSuccess() {
+                        Log.w(TAG, "onShowSuccess: success.");
+                        nav(false);
+                    }
+
+                    @Override
+                    public void onShowFailed(int errorCode) {
+                        switch (errorCode) {
+                            case ErrorCode.NON_NETWORK:
+                                Log.w(TAG, "onShowFailed: net error.");
+                                break;
+                            case ErrorCode.NON_AD:
+                                Log.w(TAG, "onShowFailed: no ad.");
+                                break;
+                            case ErrorCode.RESOURCE_NOT_READY:
+                                Log.w(TAG, "onShowFailed: not ready.");
+                                break;
+                            case ErrorCode.SHOW_INTERVAL_LIMITED:
+                                Log.w(TAG, "onShowFailed: time limit.");
+                                break;
+                            case ErrorCode.WIDGET_NOT_IN_VISIBILITY_STATE:
+                                Log.w(TAG, "onShowFailed: invisibility.");
+                                break;
+                            default:
+                                break;
+                        }
+                        nav(true);
+                    }
+
+                    @Override
+                    public void onSpotClosed() {
+                        Log.w(TAG, "onShowFailed: on closed.");
+                    }
+
+                    @Override
+                    public void onSpotClicked(boolean isWebPage) {
+                        Log.w(TAG, "onShowFailed: on click.");
+                    }
+                });
     }
 
     @Override
@@ -145,9 +267,8 @@ public class SplashActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            mInfoTv.setText("");
-            if (isReady) {
-                nav();
+            if (!isFinishing()) {
+                mInfoTv.setText("");
             }
         }
 
@@ -159,110 +280,26 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     /**
-     * 预加载广告
-     */
-    private void preloadAd() {
-        // 注意：不必每次展示插播广告前都请求，只需在应用启动时请求一次
-        SpotManager.getInstance(this).requestSpot(new SpotRequestListener() {
-            @Override
-            public void onRequestSuccess() {
-                Log.d("shenhuaLog -- " + SplashActivity.class.getSimpleName(), "onRequestSuccess: >> 请求插播广告成功");
-                // 应用安装后首次展示开屏会因为本地没有数据而跳过
-                // 如果开发者需要在首次也能展示开屏，可以在请求广告成功之前展示应用的logo，请求成功后再加载开屏
-                // setupSplashAd();
-            }
-
-            @Override
-            public void onRequestFailed(int errorCode) {
-                switch (errorCode) {
-                    case ErrorCode.NON_NETWORK:
-                        Log.d("shenhuaLog -- " + SplashActivity.class.getSimpleName(), "onRequestFailed: 网络异常");
-                        break;
-                    case ErrorCode.NON_AD:
-                        Log.d("shenhuaLog -- " + SplashActivity.class.getSimpleName(), "onRequestFailed: NO AD");
-                        break;
-                    default:
-                        break;
-                }
-            }
-        });
-    }
-
-    /**
-     * 设置开屏广告
-     */
-    private void setupSplashAd() {
-        // 创建开屏容器
-        RelativeLayout.LayoutParams params =
-                new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        params.addRule(RelativeLayout.ABOVE, R.id.adView);
-        // 对开屏进行设置
-        SplashViewSettings splashViewSettings = new SplashViewSettings();
-        splashViewSettings.setAutoJumpToTargetWhenShowFailed(false);
-        splashViewSettings.setTargetClass(MainActivity.class);
-        // 设置开屏的容器
-        splashViewSettings.setSplashViewContainer(mAdView);
-        // 展示开屏广告
-        SpotManager.getInstance(this)
-                .showSplash(this, splashViewSettings, new SpotListener() {
-
-                    @Override
-                    public void onShowSuccess() {
-                        Log.d("shenhuaLog -- " + SplashActivity.class.getSimpleName(), "onShowSuccess: 开屏展示成功");
-                    }
-
-                    @Override
-                    public void onShowFailed(int errorCode) {
-                        switch (errorCode) {
-                            case ErrorCode.NON_NETWORK:
-                                Log.d("shenhuaLog -- " + SplashActivity.class.getSimpleName(), "onShowFailed: 网络异常");
-                                break;
-                            case ErrorCode.NON_AD:
-                                Log.d("shenhuaLog -- " + SplashActivity.class.getSimpleName(), "onShowFailed: 暂无开屏广告");
-                                break;
-                            case ErrorCode.RESOURCE_NOT_READY:
-                                Log.d("shenhuaLog -- " + SplashActivity.class.getSimpleName(), "onShowFailed: 开屏资源还没准备好");
-                                break;
-                            case ErrorCode.SHOW_INTERVAL_LIMITED:
-                                Log.d("shenhuaLog -- " + SplashActivity.class.getSimpleName(), "onShowFailed: 开屏展示间隔限制");
-                                break;
-                            case ErrorCode.WIDGET_NOT_IN_VISIBILITY_STATE:
-                                Log.d("shenhuaLog -- " + SplashActivity.class.getSimpleName(), "onShowFailed: 开屏控件处在不可见状态");
-                                break;
-                            default:
-                                break;
-                        }
-                        isReady = true;
-                    }
-
-                    @Override
-                    public void onSpotClosed() {
-                        Log.d("shenhuaLog -- " + SplashActivity.class.getSimpleName(), "onShowFailed: 开屏被关闭");
-                    }
-
-                    @Override
-                    public void onSpotClicked(boolean isWebPage) {
-                        Log.d("shenhuaLog -- " + SplashActivity.class.getSimpleName(), "onShowFailed: 开屏被点击");
-                    }
-                });
-    }
-
-    /**
      * 跳转至主页面
+     *
+     * @param error if error the info showtime is longer.
      */
-    private void nav() {
+    private void nav(boolean error) {
+        long time = error ? 6000 : 1500;
         mAdView.postDelayed(new Runnable() {
             @Override
             public void run() {
                 startActivity(new Intent(SplashActivity.this, MainActivity.class));
                 SplashActivity.this.finish();
             }
-        }, 1500);
+        }, time);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        SpotManager.getInstance(this).onDestroy();
+        if (BuildConfig.ENV_TYPE == 2) {
+            SpotManager.getInstance(this).onDestroy();
+        }
     }
 }

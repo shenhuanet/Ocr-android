@@ -2,6 +2,7 @@ package com.shenhua.ocr;
 
 import android.app.Application;
 
+import com.shenhua.ocr.utils.Common;
 import com.tencent.bugly.Bugly;
 
 /**
@@ -15,6 +16,6 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        Bugly.init(getApplicationContext(), "07674e00fe", true);
+        Bugly.init(getApplicationContext(), Common.TENCENT_BUGLY_ID, true);
     }
 }

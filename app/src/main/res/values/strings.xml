@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">神话文字识别</string>
+    <string name="app_name">文字识别</string>
     <string name="string_start">开始</string>
     <string name="string_sure">确定</string>
     <string name="string_cancel">取消</string>

@@ -34,6 +34,13 @@ public class Common {
     static final String PROVIDER_CONTENT = "content";
     static final String PROVIDER_FILE = "file";
 
+    public static final String TENCENT_APP_ID = "1106498082";
+    public static final String TENCENT_POS_ID = "1106498082";
+    public static final String TENCENT_BUGLY_ID = "07674e00fe";
+
+    public static final String YOUMI_APP_ID = "85aa56a59eac8b3d";
+    public static final String YOUMI_APP_SECRET = "a14006f66f58d5d7";
+
     public static String formatDate(long date) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm", Locale.CHINA);
         return sdf.format(date);
