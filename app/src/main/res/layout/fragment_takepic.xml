@@ -25,27 +25,27 @@
             android:layout_centerVertical="true"
             android:layout_marginEnd="@dimen/size_50dp"
             android:layout_toStartOf="@+id/captureBtn"
-            android:gravity="center"
             android:contentDescription="@null"
+            android:gravity="center"
             android:padding="3dp"
             android:src="@drawable/ic_scan_album" />
 
         <ImageButton
             android:id="@+id/captureBtn"
-            android:layout_width="80dp"
             style="@style/ImageButtonStyle"
+            android:layout_width="80dp"
             android:layout_height="80dp"
-            android:contentDescription="@null"
             android:layout_centerInParent="true"
-            android:src="@drawable/ic_scan_capture"/>
+            android:contentDescription="@null"
+            android:src="@drawable/ic_scan_capture" />
 
         <ImageButton
             android:id="@+id/backBtn"
             style="@style/ImageButtonStyle.50"
             android:layout_centerVertical="true"
-            android:contentDescription="@null"
             android:layout_marginStart="@dimen/size_50dp"
             android:layout_toEndOf="@+id/captureBtn"
+            android:contentDescription="@null"
             android:src="@drawable/ic_back" />
 
     </RelativeLayout>

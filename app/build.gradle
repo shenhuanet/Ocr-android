@@ -7,7 +7,7 @@ android {
         applicationId "com.shenhua.ocr"
         minSdkVersion 21
         targetSdkVersion 22
-        versionCode 1
+        versionCode 3
         versionName "3.0.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         externalNativeBuild {

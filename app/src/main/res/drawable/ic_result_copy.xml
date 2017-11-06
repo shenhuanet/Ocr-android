@@ -1,6 +1,15 @@
-<vector android:height="24dp" android:viewportHeight="1024.0"
-    android:viewportWidth="1024.0" android:width="24dp" xmlns:android="http://schemas.android.com/apk/res/android">
-    <path android:fillColor="#03A9F4" android:pathData="M862,77h-500.3c-22.1,0 -40,17.9 -40,40v160h40V137c0,-11 9,-20 20,-20H842c11.1,0 20,9 20,20v550c0,11 -9,20 -20,20H703v40h159C884.1,747 902,729.1 902,707V117c0,-22.1 -17.9,-40 -40,-40z"/>
-    <path android:fillColor="#03A9F4" android:pathData="M682.4,257L162,257C139.9,257 122,274.9 122,297v610c0,22.1 17.9,40 40,40h520.4c22.1,0 40,-17.9 40,-40L722.4,297c0,-22.1 -17.9,-40 -40,-40zM682.4,887c0,11 -9,20 -20,20L182,907c-11.1,0 -20,-9 -20,-20L162,317c0,-11 9,-20 20,-20h480.3c11.1,0 20,9 20,20v570z"/>
-    <path android:fillColor="#03A9F4" android:pathData="M558.2,727H278.2c-11,0 -20,9 -20,20s9,20 20,20h280c11,0 20,-9 20,-20s-9,-20 -20,-20zM498.2,577H278.2c-11,0 -20,9 -20,20s9,20 20,20h220c11,0 20,-9 20,-20s-9,-20 -20,-20zM438.2,427H278.2c-11,0 -20,9 -20,20s9,20 20,20h160c11,0 20,-9 20,-20s-9,-20 -20,-20z"/>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="80dp"
+    android:height="80dp"
+    android:viewportHeight="1024.0"
+    android:viewportWidth="1024.0">
+    <path
+        android:fillColor="#03A9F4"
+        android:pathData="M862,77h-500.3c-22.1,0 -40,17.9 -40,40v160h40V137c0,-11 9,-20 20,-20H842c11.1,0 20,9 20,20v550c0,11 -9,20 -20,20H703v40h159C884.1,747 902,729.1 902,707V117c0,-22.1 -17.9,-40 -40,-40z" />
+    <path
+        android:fillColor="#03A9F4"
+        android:pathData="M682.4,257L162,257C139.9,257 122,274.9 122,297v610c0,22.1 17.9,40 40,40h520.4c22.1,0 40,-17.9 40,-40L722.4,297c0,-22.1 -17.9,-40 -40,-40zM682.4,887c0,11 -9,20 -20,20L182,907c-11.1,0 -20,-9 -20,-20L162,317c0,-11 9,-20 20,-20h480.3c11.1,0 20,9 20,20v570z" />
+    <path
+        android:fillColor="#03A9F4"
+        android:pathData="M558.2,727H278.2c-11,0 -20,9 -20,20s9,20 20,20h280c11,0 20,-9 20,-20s-9,-20 -20,-20zM498.2,577H278.2c-11,0 -20,9 -20,20s9,20 20,20h220c11,0 20,-9 20,-20s-9,-20 -20,-20zM438.2,427H278.2c-11,0 -20,9 -20,20s9,20 20,20h160c11,0 20,-9 20,-20s-9,-20 -20,-20z" />
 </vector>
