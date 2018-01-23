@@ -2,9 +2,9 @@ package com.shenhua.ocr.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.text.format.Formatter;
 
 import java.io.File;
-import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
@@ -131,7 +131,7 @@ public class Common {
         File cache = context.getCacheDir();
         File exCache = context.getExternalCacheDir();
         long size = getFolderSize(cache) + getFolderSize(exCache);
-        return formatSize(size);
+        return Formatter.formatFileSize(context, size);
     }
 
     /**
@@ -161,24 +161,6 @@ public class Common {
             e.printStackTrace();
         }
         return size;
-    }
-
-    private static String formatSize(long size) {
-        DecimalFormat df = new DecimalFormat("#.00");
-        String result;
-        if (size == 0) {
-            return "0KB";
-        }
-        if (size < 1024) {
-            result = df.format((double) size) + "B";
-        } else if (size < 1048576) {
-            result = df.format((double) size / 1024) + "KB";
-        } else if (size < 1073741824) {
-            result = df.format((double) size / 1048576) + "MB";
-        } else {
-            result = df.format((double) size / 1073741824) + "GB";
-        }
-        return result;
     }
 
     public static boolean deleteDir(File dir) {

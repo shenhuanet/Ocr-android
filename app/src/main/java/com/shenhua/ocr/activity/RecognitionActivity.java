@@ -3,7 +3,6 @@ package com.shenhua.ocr.activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
@@ -23,6 +22,11 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.animation.GlideAnimation;
+import com.bumptech.glide.request.target.SimpleTarget;
+import com.bumptech.glide.request.target.Target;
 import com.googlecode.tesseract.android.TessBaseAPI;
 import com.shenhua.ocr.R;
 import com.shenhua.ocr.dao.History;
@@ -31,7 +35,6 @@ import com.shenhua.ocr.utils.Common;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -93,6 +96,7 @@ public class RecognitionActivity extends AppCompatActivity {
      * 是否已经准备好,用于控制当图片uri为空时,设置为未准备好
      */
     private boolean isReady = true;
+    private boolean isReslove = true;
     private Uri mTempUri;
 
     @Override
@@ -103,15 +107,21 @@ public class RecognitionActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         mTempUri = getIntent().getParcelableExtra("temp");
-        Bitmap bitmap = getOriginBitmap();
-        if (bitmap == null) {
-            isReady = false;
-            Snackbar.make(mStartBtn, R.string.string_null_pic, Snackbar.LENGTH_SHORT).show();
-        }
-        mSrcIv.setImageBitmap(bitmap);
-        itemSelected(mToolsLayout.getChildAt(0));
-        mLangTv.setText(Common.getDisplayLanguage(this));
-        mExecutor = Executors.newSingleThreadExecutor();
+
+        Glide.with(this).load(mTempUri).asBitmap().diskCacheStrategy(DiskCacheStrategy.NONE)
+                .into(new SimpleTarget<Bitmap>() {
+                    @Override
+                    public void onResourceReady(Bitmap bitmap, GlideAnimation<? super Bitmap> glideAnimation) {
+                        if (bitmap == null) {
+                            isReady = false;
+                            Snackbar.make(mStartBtn, R.string.string_null_pic, Snackbar.LENGTH_SHORT).show();
+                        }
+                        mSrcIv.setImageBitmap(bitmap);
+                        itemSelected(mToolsLayout.getChildAt(0));
+                        mLangTv.setText(Common.getDisplayLanguage(RecognitionActivity.this));
+                        mExecutor = Executors.newSingleThreadExecutor();
+                    }
+                });
     }
 
     @Override
@@ -128,12 +138,19 @@ public class RecognitionActivity extends AppCompatActivity {
             Snackbar.make(mStartBtn, R.string.string_null_pic, Snackbar.LENGTH_SHORT).show();
             return;
         }
-        if (!isStarting) {
+        if (!isStarting && isReslove) {
             startScanAnim();
             mStartTv.setText(R.string.string_cancel);
             Bitmap bitmap = ((BitmapDrawable) mSrcIv.getDrawable()).getBitmap();
             Log.d("RecognitionActivity", "start recognition ...... the bitmap width is "
                     + bitmap.getWidth() + " height is " + bitmap.getHeight());
+            /*
+             * fixed: 2018/1/23
+              * rejected from java.util.concurrent.ThreadPoolExecutor@a9fcf2a[Shutting down, pool size = 1, active threads = 1, queued tasks = 0, completed tasks = 3]
+             */
+            if (mExecutor == null || mExecutor.isShutdown()) {
+                mExecutor = Executors.newSingleThreadExecutor();
+            }
             mExecutor.execute(new OcrRunnable(this, bitmap));
             isStarting = true;
         } else {
@@ -245,7 +262,7 @@ public class RecognitionActivity extends AppCompatActivity {
      * @param view views
      */
     @OnClick({R.id.originToolTv, R.id.heibaiToolTv, R.id.grayToolTv, R.id.binaryToolTv})
-    void changeTool(View view) {
+    void changeTool(final View view) {
         if (!isReady) {
             Snackbar.make(mStartBtn, R.string.string_null_pic, Snackbar.LENGTH_SHORT).show();
             return;
@@ -253,10 +270,25 @@ public class RecognitionActivity extends AppCompatActivity {
         if (view.getId() == mCurrentItem) {
             return;
         }
-        Bitmap bitmap = getOriginBitmap();
-        mCurrentItem = view.getId();
-        itemSelected(view);
-        mExecutor.execute(new BitmapResolveRunnable(bitmap, view.getId()));
+
+        Glide.with(this).load(mTempUri).asBitmap().diskCacheStrategy(DiskCacheStrategy.NONE)
+                .into(new SimpleTarget<Bitmap>() {
+                    @Override
+                    public void onResourceReady(Bitmap bitmap, GlideAnimation<? super Bitmap> glideAnimation) {
+                        if (bitmap != null) {
+                            mCurrentItem = view.getId();
+                            itemSelected(view);
+                     /*
+                      *  fixed: 2018/1/23
+                      *  rejected from java.util.concurrent.ThreadPoolExecutor@5c1b7b2[Shutting down, pool size = 1, active threads = 1, queued tasks = 0, completed tasks = 1]
+                      */
+                            if (mExecutor == null || mExecutor.isShutdown()) {
+                                mExecutor = Executors.newSingleThreadExecutor();
+                            }
+                            mExecutor.execute(new BitmapResolveRunnable(bitmap, view.getId()));
+                        }
+                    }
+                });
     }
 
     /**
@@ -296,14 +328,15 @@ public class RecognitionActivity extends AppCompatActivity {
     }
 
     /**
-     * 过去初始化图片
+     * 获取初始化图片
      *
      * @return bitmap
      */
     private Bitmap getOriginBitmap() {
         try {
-            return BitmapFactory.decodeStream(getContentResolver().openInputStream(mTempUri));
-        } catch (FileNotFoundException e) {
+            return Glide.with(this).load(mTempUri).asBitmap().diskCacheStrategy(DiskCacheStrategy.NONE)
+                    .into(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL).get();
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
@@ -375,6 +408,7 @@ public class RecognitionActivity extends AppCompatActivity {
             this.origin = origin;
             this.type = type;
             mProgressBar.setVisibility(View.VISIBLE);
+            isReslove = false;
         }
 
         @Override
@@ -401,6 +435,7 @@ public class RecognitionActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        isReslove = true;
                         mSrcIv.setImageBitmap(bitmap);
                         mProgressBar.setVisibility(View.GONE);
                     }

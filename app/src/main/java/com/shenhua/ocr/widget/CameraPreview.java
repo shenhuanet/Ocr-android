@@ -29,6 +29,7 @@ import android.util.SparseIntArray;
 import android.view.Surface;
 import android.view.TextureView;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -367,9 +368,14 @@ public class CameraPreview extends TextureView {
             if (!mCameraOpenCloseLock.tryAcquire(timeOut, TimeUnit.MILLISECONDS)) {
                 throw new RuntimeException("Time out waiting to lock camera opening.");
             }
-            manager.openCamera(mCameraId, mStateCallback, mBackgroundHandler);
-        } catch (CameraAccessException e) {
-            e.printStackTrace();
+            try {
+                if (manager != null) {
+                    manager.openCamera(mCameraId, mStateCallback, mBackgroundHandler);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                Toast.makeText(getContext().getApplicationContext(), "相机打开失败", Toast.LENGTH_SHORT).show();
+            }
         } catch (InterruptedException e) {
             throw new RuntimeException("Interrupted while trying to lock camera opening.", e);
         }
@@ -597,6 +603,10 @@ public class CameraPreview extends TextureView {
             mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AF_TRIGGER, CameraMetadata.CONTROL_AF_TRIGGER_START);
             // 通知mCaptureCallback等待锁定
             mState = STATE_WAITING_LOCK;
+            if (mCaptureSession == null) {
+                Toast.makeText(getContext(), "拍摄失败", Toast.LENGTH_SHORT).show();
+                return;
+            }
             mCaptureSession.capture(mPreviewRequestBuilder.build(), mCaptureCallback, mBackgroundHandler);
         } catch (CameraAccessException e) {
             e.printStackTrace();
