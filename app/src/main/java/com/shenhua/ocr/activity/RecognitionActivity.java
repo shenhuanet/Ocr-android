@@ -142,6 +142,10 @@ public class RecognitionActivity extends AppCompatActivity {
             startScanAnim();
             mStartTv.setText(R.string.string_cancel);
             Bitmap bitmap = ((BitmapDrawable) mSrcIv.getDrawable()).getBitmap();
+            if (bitmap == null) {
+                Snackbar.make(mStartBtn, "图片资源未准备好,请重试或准备小图", Snackbar.LENGTH_SHORT).show();
+                return;
+            }
             Log.d("RecognitionActivity", "start recognition ...... the bitmap width is "
                     + bitmap.getWidth() + " height is " + bitmap.getHeight());
             /*

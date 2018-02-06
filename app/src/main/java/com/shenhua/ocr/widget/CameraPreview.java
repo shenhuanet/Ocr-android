@@ -195,12 +195,12 @@ public class CameraPreview extends TextureView {
     }
 
     private void stopBackgroundThread() {
-        mBackgroundThread.quitSafely();
         try {
+            mBackgroundThread.quitSafely();
             mBackgroundThread.join();
             mBackgroundThread = null;
             mBackgroundHandler = null;
-        } catch (InterruptedException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -569,7 +569,7 @@ public class CameraPreview extends TextureView {
                                     setAutoFlash(mPreviewRequestBuilder);
                                     mPreviewRequest = mPreviewRequestBuilder.build();
                                     mCaptureSession.setRepeatingRequest(mPreviewRequest, mCaptureCallback, mBackgroundHandler);
-                                } catch (CameraAccessException e) {
+                                } catch (Exception e) {
                                     e.printStackTrace();
                                 }
                             }
@@ -608,8 +608,10 @@ public class CameraPreview extends TextureView {
                 return;
             }
             mCaptureSession.capture(mPreviewRequestBuilder.build(), mCaptureCallback, mBackgroundHandler);
-        } catch (CameraAccessException e) {
+        } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            mState = STATE_WAITING_LOCK;
         }
     }
 
@@ -626,8 +628,10 @@ public class CameraPreview extends TextureView {
             mState = STATE_PREVIEW;
             mCaptureSession.setRepeatingRequest(mPreviewRequest, mCaptureCallback,
                     mBackgroundHandler);
-        } catch (CameraAccessException e) {
+        } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            mState = STATE_PREVIEW;
         }
     }
 
@@ -709,7 +713,12 @@ public class CameraPreview extends TextureView {
 
         @Override
         public void onImageAvailable(ImageReader reader) {
-            mBackgroundHandler.post(new ImageSaver(reader.acquireNextImage(), mFile));
+            try {
+                mBackgroundHandler.post(new ImageSaver(reader.acquireNextImage(), mFile));
+            } catch (Exception e) {
+                e.printStackTrace();
+                Toast.makeText(getContext(), "状态异常", Toast.LENGTH_SHORT).show();
+            }
         }
     };
 

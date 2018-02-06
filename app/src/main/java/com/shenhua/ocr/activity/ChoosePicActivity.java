@@ -153,6 +153,10 @@ public class ChoosePicActivity extends AppCompatActivity {
      * 跳转至识别Activity
      */
     private void navRecognition() {
+        if (mOutUri == null) {
+            Toast.makeText(this, "读取文件权限失败", Toast.LENGTH_SHORT).show();
+            return;
+        }
         startActivity(new Intent(this, RecognitionActivity.class).putExtra("temp", mOutUri));
         setResult(RESULT_OK);
         this.finish();
