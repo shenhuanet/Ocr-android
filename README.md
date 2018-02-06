@@ -9,6 +9,15 @@
 	<img width="300" height="533" src="https://github.com/shenhuanet/Ocr-android/blob/master/screenshot/img_history.png"/>
 </div>
 
+## 更新日志
+v3.0.2
+* 修复已知bug
+
+v3.0.0
+* 修复已知bug
+* UI重构
+* 优化识别速度
+
 ## 关于作者
 博客：http://blog.csdn.net/klxh2009<br>
 简书：http://www.jianshu.com/u/12a81897d5bc
